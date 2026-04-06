@@ -2,24 +2,9 @@
   "updated_at": "2026-04-06T13:20:00.000000+00:00",
   "quarter": "Q2-2026",
   "quarter_start": "2026-04-01",
-  "closed_won": [
-    { "week": "2026-04-06", "owner_id": "76991650", "owner_name": "Alberto Marchetti", "amount": 8400,  "count": 2 },
-    { "week": "2026-04-06", "owner_id": "84528640", "owner_name": "Jakob Hauser",       "amount": 11200, "count": 3 },
-    { "week": "2026-04-06", "owner_id": "87073113", "owner_name": "Manuel Martinez",    "amount": 6300,  "count": 1 },
-    { "week": "2026-04-06", "owner_id": "89389021", "owner_name": "Omri Daniel",        "amount": 15000, "count": 2 }
-  ],
-  "offers_sent": [
-    { "week": "2026-04-06", "owner_id": "76991650", "owner_name": "Alberto Marchetti", "count": 4 },
-    { "week": "2026-04-06", "owner_id": "84528640", "owner_name": "Jakob Hauser",       "count": 5 },
-    { "week": "2026-04-06", "owner_id": "87073113", "owner_name": "Manuel Martinez",    "count": 3 },
-    { "week": "2026-04-06", "owner_id": "89389021", "owner_name": "Omri Daniel",        "count": 6 }
-  ],
-  "meetings": [
-    { "week": "2026-04-06", "owner_id": "76991650", "owner_name": "Alberto Marchetti", "count": 11 },
-    { "week": "2026-04-06", "owner_id": "84528640", "owner_name": "Jakob Hauser",       "count": 12 },
-    { "week": "2026-04-06", "owner_id": "87073113", "owner_name": "Manuel Martinez",    "count": 10 },
-    { "week": "2026-04-06", "owner_id": "89389021", "owner_name": "Omri Daniel",        "count": 14 }
-  ],
+  "closed_won": [],
+  "offers_sent": [],
+  "meetings": [],
   "pipeline_snapshot": [
     {
       "owner_id": "76991650",
