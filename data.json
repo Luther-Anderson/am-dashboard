@@ -1,0 +1,114 @@
+{
+  "updated_at": "2026-04-06T11:18:59.283526+00:00",
+  "quarter": "Q2-2026",
+  "quarter_start": "2026-04-01",
+  "closed_won": [],
+  "offers_sent": [],
+  "meetings": [],
+  "pipeline_snapshot": [
+    {
+      "owner_id": "76991650",
+      "owner_name": "Alberto Marchetti",
+      "stage": "New lead",
+      "stage_order": 1,
+      "count": 11,
+      "value": 0.0
+    },
+    {
+      "owner_id": "84528640",
+      "owner_name": "Jakob Hauser",
+      "stage": "New lead",
+      "stage_order": 1,
+      "count": 13,
+      "value": 2376.0
+    },
+    {
+      "owner_id": "87073113",
+      "owner_name": "Manuel Martinez",
+      "stage": "New lead",
+      "stage_order": 1,
+      "count": 11,
+      "value": 2376.0
+    },
+    {
+      "owner_id": "76991650",
+      "owner_name": "Alberto Marchetti",
+      "stage": "Qualified",
+      "stage_order": 2,
+      "count": 12,
+      "value": 4768.0
+    },
+    {
+      "owner_id": "84528640",
+      "owner_name": "Jakob Hauser",
+      "stage": "Qualified",
+      "stage_order": 2,
+      "count": 12,
+      "value": 7380.0
+    },
+    {
+      "owner_id": "87073113",
+      "owner_name": "Manuel Martinez",
+      "stage": "Qualified",
+      "stage_order": 2,
+      "count": 18,
+      "value": 27926.0
+    },
+    {
+      "owner_id": "76991650",
+      "owner_name": "Alberto Marchetti",
+      "stage": "Explored",
+      "stage_order": 3,
+      "count": 9,
+      "value": 9288.0
+    },
+    {
+      "owner_id": "84528640",
+      "owner_name": "Jakob Hauser",
+      "stage": "Explored",
+      "stage_order": 3,
+      "count": 37,
+      "value": 53396.0
+    },
+    {
+      "owner_id": "87073113",
+      "owner_name": "Manuel Martinez",
+      "stage": "Explored",
+      "stage_order": 3,
+      "count": 2,
+      "value": 4388.0
+    },
+    {
+      "owner_id": "76991650",
+      "owner_name": "Alberto Marchetti",
+      "stage": "Advised",
+      "stage_order": 4,
+      "count": 14,
+      "value": 26403.6
+    },
+    {
+      "owner_id": "84528640",
+      "owner_name": "Jakob Hauser",
+      "stage": "Advised",
+      "stage_order": 4,
+      "count": 16,
+      "value": 37508.0
+    },
+    {
+      "owner_id": "87073113",
+      "owner_name": "Manuel Martinez",
+      "stage": "Advised",
+      "stage_order": 4,
+      "count": 10,
+      "value": 19782.4
+    },
+    {
+      "owner_id": "76991650",
+      "owner_name": "Alberto Marchetti",
+      "stage": "Offer Signed",
+      "stage_order": 5,
+      "count": 2,
+      "value": 5400.0
+    }
+  ]
+}
