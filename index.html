@@ -91,8 +91,10 @@ function getQuarterWeeks(start, end) {
   const s = new Date(start + 'T00:00:00Z');
   const e = new Date(end   + 'T00:00:00Z');
   const day = s.getUTCDay();
+  // First Monday ON OR AFTER quarter start
+  const daysAhead = day === 1 ? 0 : (8 - day) % 7;
   const mon = new Date(s);
-  mon.setUTCDate(s.getUTCDate() + (day === 0 ? -6 : 1 - day));
+  mon.setUTCDate(s.getUTCDate() + daysAhead);
   const weeks = [];
   const cur = new Date(mon);
   while (cur <= e) {

@@ -60,10 +60,12 @@ def cell_to_date(val):
     return None
 
 def quarter_mondays(quarter_start, quarter_end):
-    """Return list of Monday ISO strings covering the quarter."""
+    """Return list of Monday ISO strings starting on the first Monday ON OR AFTER quarter_start."""
     s = datetime.fromisoformat(quarter_start)
     e = datetime.fromisoformat(quarter_end)
-    start_mon = s - timedelta(days=s.weekday())
+    # s.weekday(): Mon=0 … Sun=6 → days until next Monday
+    days_ahead = (7 - s.weekday()) % 7
+    start_mon = s + timedelta(days=days_ahead)
     weeks, cur = [], start_mon
     while cur.date() <= e.date():
         weeks.append(cur.strftime('%Y-%m-%d'))
