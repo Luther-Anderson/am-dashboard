@@ -260,19 +260,33 @@ const baseOpts = () => ({
   },
 });
 
+function attainFill(data, paceData) {
+  const lastIdx = data.reduce((acc, v, i) => v !== null ? i : acc, -1);
+  const actual  = lastIdx >= 0 ? data[lastIdx] : 0;
+  const pace    = paceData[lastIdx] || 0;
+  const pct     = pace > 0 ? actual / pace : 1;
+  if (pct >= 1)   return { line: '#22c55e', fill: '#22c55e28' };
+  if (pct >= 0.9) return { line: '#f97316', fill: '#f9731628' };
+  return               { line: '#f43f5e', fill: '#f43f5e28' };
+}
+
 function paceChart(id, labels, actuals, paceData, yFmt) {
-  const ds = actuals.map(({ label, data, color }) => ({
-    label, data,
-    borderColor: color, backgroundColor: color + '15',
-    borderWidth: 2, tension: 0.3, pointRadius: 2.5, fill: false,
-  }));
+  const ds = actuals.map(({ label, data }) => {
+    const { line, fill } = attainFill(data, paceData);
+    return {
+      label, data,
+      borderColor: line, backgroundColor: fill,
+      borderWidth: 2, tension: 0.3, pointRadius: 3.5, fill: 'origin',
+    };
+  });
   ds.push({
     label: '— Target pace', data: paceData,
-    borderColor: PACE_COLOR, borderWidth: 1.5, borderDash: [6, 4],
+    borderColor: PACE_COLOR, backgroundColor: 'transparent',
+    borderWidth: 1.5, borderDash: [6, 4],
     tension: 0, pointRadius: 0, fill: false,
   });
   const opts = baseOpts();
-  opts.plugins.tooltip.callbacks = { label: c => ` ${c.dataset.label}: ${yFmt(c.raw)}` };
+  opts.plugins.tooltip.callbacks = { label: c => c.raw !== null ? ` ${c.dataset.label}: ${yFmt(c.raw)}` : null };
   opts.scales.y.ticks.callback = v => yFmt(v);
   mkChart(id, { type: 'line', data: { labels, datasets: ds }, options: opts });
 }
