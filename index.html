@@ -178,12 +178,18 @@ function process(data, manual) {
   const teamConv = teamOfQtd > 0 ? sum(cwCount) / teamOfQtd : 0;
 
   // Cumulative weekly: { labels, team: [...], [ownerId]: [...] }
+  // Weeks after todayW get null so the line stops at the current week
   function cumulative(map, weeks) {
     const running = {};
     let teamRun = 0;
     const out = { labels: weeks.map(fmtWeek), team: [] };
     for (const ae of AE_LIST) out[ae.id] = [];
     for (const w of weeks) {
+      if (w > todayW) {
+        for (const ae of AE_LIST) out[ae.id].push(null);
+        out.team.push(null);
+        continue;
+      }
       const wd = map[w] || {};
       let tw = 0;
       for (const ae of AE_LIST) {
