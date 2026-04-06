@@ -373,6 +373,19 @@ function card(title, value, sub, extra = '') {
   </div>`;
 }
 
+function narrativeBox(title, icon, items) {
+  if (!items || !items.length) return '';
+  const bullets = items.map(t => `
+    <li class="flex gap-2 text-sm text-slate-700 leading-snug">
+      <span class="text-slate-300 mt-0.5">—</span>
+      <span>${t}</span>
+    </li>`).join('');
+  return `<div class="bg-white rounded-xl p-5 shadow-sm fade-in">
+    <p class="text-xs font-medium text-slate-400 uppercase tracking-wide mb-3">${icon}&nbsp; ${title}</p>
+    <ul class="space-y-2">${bullets}</ul>
+  </div>`;
+}
+
 function chartBox(title, canvasId, h = 260) {
   return `<div class="bg-white rounded-xl p-4 shadow-sm">
     <p class="text-sm font-semibold text-slate-700 mb-3">${title}</p>
@@ -381,7 +394,7 @@ function chartBox(title, canvasId, h = 260) {
 }
 
 // ─── Render ────────────────────────────────────────────────────────────────
-function renderTeam(p, manual) {
+function renderTeam(p, manual, data) {
   const panel = document.getElementById('panel-team');
   const qt = manual.team.cash_in_quarterly_target;
   const mtQ = manual.team.weekly_meetings_target * p.numWeeks;
@@ -400,8 +413,13 @@ function renderTeam(p, manual) {
       ${chartBox('Meetings vs Quarterly Pace',      'c-meet-team',     280)}
       ${chartBox('Offers Sent vs Quarterly Pace',   'c-offers-team',   280)}
       ${chartBox('Conversion Rate (Team QTD)',       'c-conv-team',     280)}
-      <div class="lg:col-span-2">${chartBox('Pipeline Snapshot (€ by Stage)', 'c-pipe-team', 260)}</div>
-    </div>`;
+    </div>
+    ${(data.highlights?.length || data.focus?.length) ? `
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-4">
+      ${narrativeBox('Team Highlights', '🏆', data.highlights)}
+      ${narrativeBox('Focus This Week', '🎯', data.focus)}
+    </div>` : ''}
+    <div class="mt-4">${chartBox('Pipeline Snapshot (€ by Stage)', 'c-pipe-team', 260)}</div>`;
 }
 
 function initTeamCharts(p, manual) {
@@ -516,7 +534,7 @@ Promise.all([
   initTabs();
 
   const p = process(data, manual);
-  renderTeam(p, manual);
+  renderTeam(p, manual, data);
   AE_LIST.forEach(ae => renderAE(ae, p, manual));
 
   requestAnimationFrame(() => requestAnimationFrame(() => {
