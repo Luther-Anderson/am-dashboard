@@ -1,0 +1,12 @@
+{
+  "name": "ae-dashboard",
+  "version": "1.0.0",
+  "description": "Sortlist AE team KPI dashboard",
+  "type": "module",
+  "scripts": {
+    "sync": "node sync.js"
+  },
+  "dependencies": {
+    "node-fetch": "^3.3.2"
+  }
+}

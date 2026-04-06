@@ -1,0 +1,17 @@
+{
+  "quarter": "Q2-2026",
+  "quarter_start": "2026-04-01",
+  "quarter_end": "2026-06-30",
+  "team": {
+    "cash_in_quarterly_target": 134400,
+    "weekly_meetings_target": 44,
+    "weekly_offers_target": 18
+  },
+  "per_ae": {
+    "76991650": { "name": "Alberto Marchetti", "cash_in_quarterly": 33600, "weekly_meetings": 11, "weekly_offers": 4.3 },
+    "40312105": { "name": "Célia Denouette", "active": false, "cash_in_quarterly": 0, "weekly_meetings": 0, "weekly_offers": 0 },
+    "84528640": { "name": "Jakob Hauser",       "cash_in_quarterly": 33600, "weekly_meetings": 11, "weekly_offers": 4.3 },
+    "87073113": { "name": "Manuel Martinez",    "cash_in_quarterly": 33600, "weekly_meetings": 11, "weekly_offers": 4.3 },
+    "89389021": { "name": "Omri Daniel",        "cash_in_quarterly": 60000, "weekly_meetings": 11, "weekly_offers": 5 }
+  }
+}

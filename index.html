@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AE Dashboard — Sortlist</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ['Inter', 'sans-serif'] },
+          colors: {
+            primary:   { 50: '#f0f4ff', 500: '#477FFC' },
+            secondary: { 50: '#f8fafc', 100: '#f1f5f9', 200: '#e2e8f0' },
+            success:   { 500: '#22c55e' },
+            danger:    { 500: '#f43f5e' },
+          }
+        }
+      }
+    }
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+    .tab-btn { transition: background 0.12s, box-shadow 0.12s; }
+    .tab-btn.active { background: white; box-shadow: 0 1px 3px rgba(0,0,0,0.1); color: #1e293b; }
+    .fade-in { animation: fadeIn 0.35s ease both; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: none; } }
+    .card-stagger:nth-child(1) { animation-delay: 0.04s; }
+    .card-stagger:nth-child(2) { animation-delay: 0.08s; }
+    .card-stagger:nth-child(3) { animation-delay: 0.12s; }
+    .card-stagger:nth-child(4) { animation-delay: 0.16s; }
+    .card-stagger:nth-child(5) { animation-delay: 0.20s; }
+  </style>
+</head>
+<body class="bg-secondary-50 text-slate-800 min-h-screen">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 py-6">
+
+  <!-- Header -->
+  <div class="flex items-start justify-between mb-6">
+    <div>
+      <h1 class="text-xl font-semibold text-slate-900">AE Dashboard</h1>
+      <p class="text-sm text-slate-400 mt-0.5" id="header-subtitle">Loading…</p>
+    </div>
+  </div>
+
+  <!-- Tab nav -->
+  <div class="bg-secondary-100 rounded-xl p-1 flex gap-1 mb-6 w-fit flex-wrap" id="tab-nav">
+    <button class="tab-btn active px-4 py-1.5 rounded-lg text-sm font-medium text-slate-600" data-tab="team">Team</button>
+  </div>
+
+  <!-- Panels container -->
+  <div id="panels">
+    <div id="panel-team" data-panel="team">
+      <div class="bg-white rounded-xl p-8 text-center shadow-sm text-slate-400 text-sm">Loading data…</div>
+    </div>
+  </div>
+
+</div>
+<script>
+// ─── Config ────────────────────────────────────────────────────────────────
+const AE_LIST = [
+  { id: '76991650', name: 'Alberto Marchetti', short: 'Alberto', color: '#8b5cf6' },
+  // Célia Denouette (40312105) — on leave Q2-2026
+  { id: '84528640', name: 'Jakob Hauser',       short: 'Jakob',   color: '#0ea5e9' },
+  { id: '87073113', name: 'Manuel Martinez',    short: 'Manuel',  color: '#22c55e' },
+  { id: '89389021', name: 'Omri Daniel',        short: 'Omri',    color: '#f43f5e' },
+];
+const PACE_COLOR  = '#94a3b8';
+const TEAM_COLOR  = '#1e293b';
+
+Chart.defaults.font.family = 'Inter';
+Chart.defaults.color = '#64748b';
+Chart.register(ChartDataLabels);
+
+// ─── Utilities ─────────────────────────────────────────────────────────────
+function weekStart(dateVal) {
+  const d = new Date(typeof dateVal === 'string' ? dateVal : Number(dateVal));
+  const day = d.getUTCDay();
+  const diff = day === 0 ? -6 : 1 - day;
+  const mon = new Date(d);
+  mon.setUTCDate(d.getUTCDate() + diff);
+  return mon.toISOString().split('T')[0];
+}
+
+function getQuarterWeeks(start, end) {
+  const s = new Date(start + 'T00:00:00Z');
+  const e = new Date(end   + 'T00:00:00Z');
+  const day = s.getUTCDay();
+  const mon = new Date(s);
+  mon.setUTCDate(s.getUTCDate() + (day === 0 ? -6 : 1 - day));
+  const weeks = [];
+  const cur = new Date(mon);
+  while (cur <= e) {
+    weeks.push(cur.toISOString().split('T')[0]);
+    cur.setUTCDate(cur.getUTCDate() + 7);
+  }
+  return weeks;
+}
+
+function fmtWeek(w) {
+  return new Date(w + 'T00:00:00Z')
+    .toLocaleDateString('en-GB', { day: 'numeric', month: 'short', timeZone: 'UTC' });
+}
+
+function fmtEur(v) {
+  if (v >= 1e6) return '€' + (v / 1e6).toFixed(2) + 'M';
+  if (v >= 1e3) return '€' + Math.round(v / 1e3) + 'k';
+  return '€' + Math.round(v);
+}
+
+function paceArr(target, n) {
+  const w = target / n;
+  return Array.from({ length: n }, (_, i) => Math.round(w * (i + 1)));
+}
+
+// ─── Data processing ───────────────────────────────────────────────────────
+function process(data, manual) {
+  const qWeeks   = getQuarterWeeks(manual.quarter_start, manual.quarter_end);
+  const numWeeks = qWeeks.length;
+  const today    = new Date();
+  const todayW   = weekStart(today.toISOString().split('T')[0]);
+
+  // Complete weeks (ended before today's Monday)
+  const completeWeeks = qWeeks.filter(w => w < todayW);
+  const lastWeek = completeWeeks.at(-1) || null;
+  const currentWeekIdx = qWeeks.indexOf(todayW);
+
+  // week+owner maps  { [week]: { [ownerId]: value } }
+  function toMap(records, valueKey) {
+    const m = {};
+    for (const r of records) {
+      if (!m[r.week]) m[r.week] = {};
+      m[r.week][r.owner_id] = (m[r.week][r.owner_id] || 0) + (r[valueKey] || 0);
+    }
+    return m;
+  }
+  const cwMap  = toMap(data.closed_won,  'amount');
+  const ofMap  = toMap(data.offers_sent, 'count');
+  const mtMap  = toMap(data.meetings,    'count');
+
+  // QTD totals per AE
+  function qtd(map) {
+    const t = {};
+    for (const [, owners] of Object.entries(map))
+      for (const [id, v] of Object.entries(owners))
+        t[id] = (t[id] || 0) + v;
+    return t;
+  }
+  const cashInQtd   = qtd(cwMap);
+  const offersQtd   = qtd(ofMap);
+  const meetingsQtd = qtd(mtMap);
+
+  // Last-week per AE
+  const cashInLW   = lastWeek ? (cwMap[lastWeek]  || {}) : {};
+  const offersLW   = lastWeek ? (ofMap[lastWeek]  || {}) : {};
+  const meetingsLW = lastWeek ? (mtMap[lastWeek]  || {}) : {};
+
+  // Team totals
+  const sum = obj => Object.values(obj).reduce((a, b) => a + b, 0);
+  const teamCashQtd  = sum(cashInQtd);
+  const teamOfQtd    = sum(offersQtd);
+  const teamMtQtd    = sum(meetingsQtd);
+  const teamCashLW   = sum(cashInLW);
+  const teamOfLW     = sum(offersLW);
+  const teamMtLW     = sum(meetingsLW);
+
+  // Conversion rate: closed-won count / offers sent count (QTD)
+  const cwCount = {};
+  for (const r of data.closed_won) cwCount[r.owner_id] = (cwCount[r.owner_id] || 0) + (r.count || 1);
+  const convRate = {};
+  for (const ae of AE_LIST)
+    convRate[ae.id] = (offersQtd[ae.id] || 0) > 0 ? (cwCount[ae.id] || 0) / offersQtd[ae.id] : 0;
+  const teamConv = teamOfQtd > 0 ? sum(cwCount) / teamOfQtd : 0;
+
+  // Cumulative weekly: { labels, team: [...], [ownerId]: [...] }
+  function cumulative(map, weeks) {
+    const running = {};
+    let teamRun = 0;
+    const out = { labels: weeks.map(fmtWeek), team: [] };
+    for (const ae of AE_LIST) out[ae.id] = [];
+    for (const w of weeks) {
+      const wd = map[w] || {};
+      let tw = 0;
+      for (const ae of AE_LIST) {
+        const v = wd[ae.id] || 0;
+        running[ae.id] = (running[ae.id] || 0) + v;
+        out[ae.id].push(running[ae.id]);
+        tw += v;
+      }
+      teamRun += tw;
+      out.team.push(teamRun);
+    }
+    return out;
+  }
+  const cwCum = cumulative(cwMap, qWeeks);
+  const mtCum = cumulative(mtMap, qWeeks);
+  const ofCum = cumulative(ofMap, qWeeks);
+
+  // Weekly bars per AE: { labels, [ownerId]: [...] }
+  function weekly(map, weeks) {
+    const out = { labels: weeks.map(fmtWeek) };
+    for (const ae of AE_LIST)
+      out[ae.id] = weeks.map(w => (map[w] || {})[ae.id] || 0);
+    return out;
+  }
+  const ofWeekly = weekly(ofMap, qWeeks);
+  const mtWeekly = weekly(mtMap, qWeeks);
+
+  // Pace lines
+  const teamCashPace = paceArr(manual.team.cash_in_quarterly_target, numWeeks);
+  const teamMtPace   = paceArr(manual.team.weekly_meetings_target * numWeeks, numWeeks);
+  const teamOfPace   = paceArr(manual.team.weekly_offers_target   * numWeeks, numWeeks);
+
+  return {
+    qWeeks, numWeeks, lastWeek, currentWeekIdx,
+    // QTD
+    cashInQtd, offersQtd, meetingsQtd, convRate,
+    teamCashQtd, teamOfQtd, teamMtQtd, teamConv,
+    // Last week
+    cashInLW, offersLW, meetingsLW,
+    teamCashLW, teamOfLW, teamMtLW,
+    // Chart data
+    cwCum, mtCum, ofCum, ofWeekly, mtWeekly,
+    teamCashPace, teamMtPace, teamOfPace,
+    pipelineSnapshot: data.pipeline_snapshot,
+  };
+}
+
+// ─── Chart helpers ─────────────────────────────────────────────────────────
+const charts = {};
+function mkChart(id, cfg) {
+  if (charts[id]) charts[id].destroy();
+  const el = document.getElementById(id);
+  if (!el) return;
+  charts[id] = new Chart(el, cfg);
+}
+
+const baseOpts = () => ({
+  responsive: true,
+  maintainAspectRatio: false,
+  plugins: {
+    legend: { position: 'top', labels: { boxWidth: 8, pointStyle: 'circle', usePointStyle: true, font: { size: 11 }, padding: 12 } },
+    datalabels: { display: false },
+    tooltip: { backgroundColor: '#1c1917', titleColor: '#e7e5e4', bodyColor: '#d6d3d1', padding: 10, cornerRadius: 8 },
+  },
+  scales: {
+    x: { grid: { display: false }, ticks: { font: { size: 11 } } },
+    y: { grid: { color: 'rgba(0,0,0,0.04)' }, ticks: { font: { size: 11 } } },
+  },
+});
+
+function paceChart(id, labels, actuals, paceData, yFmt) {
+  const ds = actuals.map(({ label, data, color }) => ({
+    label, data,
+    borderColor: color, backgroundColor: color + '15',
+    borderWidth: 2, tension: 0.3, pointRadius: 2.5, fill: false,
+  }));
+  ds.push({
+    label: '— Target pace', data: paceData,
+    borderColor: PACE_COLOR, borderWidth: 1.5, borderDash: [6, 4],
+    tension: 0, pointRadius: 0, fill: false,
+  });
+  const opts = baseOpts();
+  opts.plugins.tooltip.callbacks = { label: c => ` ${c.dataset.label}: ${yFmt(c.raw)}` };
+  opts.scales.y.ticks.callback = v => yFmt(v);
+  mkChart(id, { type: 'line', data: { labels, datasets: ds }, options: opts });
+}
+
+function stackedBar(id, labels, datasets, yFmt, curIdx) {
+  const ds = datasets.map(({ label, data, color }) => ({
+    label, data,
+    backgroundColor: data.map((_, i) => i === curIdx ? color + '50' : color + 'c0'),
+    borderColor: data.map((_, i) => i === curIdx ? color : 'transparent'),
+    borderWidth: 1,
+    borderRadius: 3,
+  }));
+  const opts = baseOpts();
+  opts.plugins.tooltip.callbacks = { label: c => ` ${c.dataset.label}: ${yFmt(c.raw)}` };
+  opts.scales.x.stacked = true;
+  opts.scales.y.stacked = true;
+  opts.scales.y.ticks.callback = v => yFmt(v);
+  mkChart(id, { type: 'bar', data: { labels, datasets: ds }, options: opts });
+}
+
+function conversionChart(id, labels, values, colors) {
+  const opts = baseOpts();
+  opts.plugins.legend = { display: false };
+  opts.plugins.datalabels = {
+    display: true, anchor: 'end', align: 'top',
+    formatter: v => v + '%', font: { size: 11, weight: '600' }, color: '#475569',
+  };
+  opts.plugins.tooltip.callbacks = { label: c => ` ${c.raw}% conversion` };
+  opts.scales.y.ticks.callback = v => v + '%';
+  opts.scales.y.max = 100;
+  mkChart(id, {
+    type: 'bar',
+    data: {
+      labels,
+      datasets: [{ data: values.map(v => (v * 100).toFixed(1)), backgroundColor: colors.map(c => c + 'c0'), borderColor: colors, borderWidth: 1.5, borderRadius: 4 }],
+    },
+    options: opts,
+  });
+}
+
+function pipelineChart(id, snapshot, filterAeIds) {
+  const stages = ['New lead', 'Qualified', 'Explored', 'Advised', 'Offer Signed'];
+  const aes = filterAeIds ? AE_LIST.filter(ae => filterAeIds.includes(ae.id)) : AE_LIST;
+  const ds = aes.map(ae => ({
+    label: ae.short,
+    data: stages.map(s => (snapshot.find(r => r.owner_id === ae.id && r.stage === s) || {}).value || 0),
+    backgroundColor: ae.color + 'c0',
+    borderColor: ae.color,
+    borderWidth: 1,
+    borderRadius: 3,
+  }));
+  const opts = baseOpts();
+  opts.plugins.tooltip.callbacks = { label: c => ` ${c.dataset.label}: ${fmtEur(c.raw)}` };
+  opts.scales.x.stacked = true;
+  opts.scales.y.stacked = true;
+  opts.scales.y.ticks.callback = v => fmtEur(v);
+  mkChart(id, { type: 'bar', data: { labels: stages, datasets: ds }, options: opts });
+}
+
+// ─── DOM builders ──────────────────────────────────────────────────────────
+function attainEmoji(actual, target) {
+  if (!target) return '';
+  const pct = (actual / target) * 100;
+  const em = pct >= 100 ? '🟢' : pct >= 90 ? '🟠' : '🔴';
+  return `${em} ${pct.toFixed(0)}% of target`;
+}
+
+function progressBar(current, target, color) {
+  const pct = Math.min(100, (current / (target || 1)) * 100).toFixed(1);
+  return `<div class="mt-2">
+    <div class="flex justify-between text-xs text-slate-400 mb-1"><span>${pct}% attainment</span><span>Target: ${typeof target === 'number' && target >= 1000 ? fmtEur(target) : target}</span></div>
+    <div class="w-full bg-secondary-200 rounded-full h-1.5"><div class="h-1.5 rounded-full transition-all" style="width:${pct}%;background:${color}"></div></div>
+  </div>`;
+}
+
+function card(title, value, sub, extra = '') {
+  return `<div class="bg-white rounded-xl p-4 shadow-sm fade-in card-stagger">
+    <p class="text-xs font-medium text-slate-400 uppercase tracking-wide leading-none">${title}</p>
+    <p class="text-2xl font-semibold text-slate-900 mt-1.5">${value}</p>
+    ${sub ? `<p class="text-xs text-slate-500 mt-0.5">${sub}</p>` : ''}
+    ${extra}
+  </div>`;
+}
+
+function chartBox(title, canvasId, h = 260) {
+  return `<div class="bg-white rounded-xl p-4 shadow-sm">
+    <p class="text-sm font-semibold text-slate-700 mb-3">${title}</p>
+    <div style="height:${h}px"><canvas id="${canvasId}"></canvas></div>
+  </div>`;
+}
+
+// ─── Render ────────────────────────────────────────────────────────────────
+function renderTeam(p, manual) {
+  const panel = document.getElementById('panel-team');
+  const qt = manual.team.cash_in_quarterly_target;
+  const mtQ = manual.team.weekly_meetings_target * p.numWeeks;
+  const ofQ = manual.team.weekly_offers_target   * p.numWeeks;
+
+  panel.innerHTML = `
+    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 mb-5">
+      ${card('Cash-In QTD',         fmtEur(p.teamCashQtd), `vs ${fmtEur(qt)} Q target`, progressBar(p.teamCashQtd, qt, '#477FFC'))}
+      ${card('Cash-In Last Week',   fmtEur(p.teamCashLW),  attainEmoji(p.teamCashLW, qt / p.numWeeks))}
+      ${card('Meetings Last Week',  p.teamMtLW,            attainEmoji(p.teamMtLW, manual.team.weekly_meetings_target))}
+      ${card('Offers Last Week',    p.teamOfLW,            attainEmoji(p.teamOfLW, manual.team.weekly_offers_target))}
+      ${card('Conversion QTD',      (p.teamConv * 100).toFixed(1) + '%', 'offers → closed won')}
+    </div>
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+      ${chartBox('Cash-In vs Quarterly Pace',        'c-cash-team',     280)}
+      ${chartBox('Meetings vs Quarterly Pace',      'c-meet-team',     280)}
+      ${chartBox('Offers Sent vs Quarterly Pace',   'c-offers-team',   280)}
+      ${chartBox('Conversion Rate (Team QTD)',       'c-conv-team',     280)}
+      <div class="lg:col-span-2">${chartBox('Pipeline Snapshot (€ by Stage)', 'c-pipe-team', 260)}</div>
+    </div>`;
+}
+
+function initTeamCharts(p, manual) {
+  paceChart('c-cash-team', p.cwCum.labels,
+    [{ label: 'Team', data: p.cwCum.team, color: TEAM_COLOR }],
+    p.teamCashPace, fmtEur);
+
+  paceChart('c-meet-team', p.mtCum.labels,
+    [{ label: 'Team', data: p.mtCum.team, color: TEAM_COLOR }],
+    p.teamMtPace, v => v);
+
+  paceChart('c-offers-team', p.ofCum.labels,
+    [{ label: 'Team', data: p.ofCum.team, color: TEAM_COLOR }],
+    p.teamOfPace, v => v);
+
+  conversionChart('c-conv-team', ['Team'], [p.teamConv], [TEAM_COLOR]);
+
+  pipelineChart('c-pipe-team', p.pipelineSnapshot, null);
+}
+
+function renderAE(ae, p, manual) {
+  const tgt  = manual.per_ae[ae.id] || {};
+  const cqT  = tgt.cash_in_quarterly || 0;
+  const mwT  = tgt.weekly_meetings   || 0;
+  const owT  = tgt.weekly_offers     || 0;
+
+  const cashQ  = p.cashInQtd[ae.id]  || 0;
+  const offQ   = p.offersQtd[ae.id]  || 0;
+  const mtQ    = p.meetingsQtd[ae.id] || 0;
+  const conv   = p.convRate[ae.id]    || 0;
+  const cashLW = p.cashInLW[ae.id]    || 0;
+  const mtLW   = p.meetingsLW[ae.id]  || 0;
+  const ofLW   = p.offersLW[ae.id]    || 0;
+
+  const div = document.createElement('div');
+  div.id = `panel-${ae.id}`;
+  div.setAttribute('data-panel', ae.id);
+  div.classList.add('hidden');
+
+  div.innerHTML = `
+    <div class="flex items-center gap-2 mb-4">
+      <div class="w-2.5 h-2.5 rounded-full" style="background:${ae.color}"></div>
+      <h2 class="text-base font-semibold text-slate-800">${ae.name}</h2>
+    </div>
+    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 mb-5">
+      ${card('Cash-In QTD',       fmtEur(cashQ),   `vs ${fmtEur(cqT)} Q target`, progressBar(cashQ, cqT, ae.color))}
+      ${card('Cash-In Last Week', fmtEur(cashLW),  attainEmoji(cashLW, cqT / p.numWeeks))}
+      ${card('Meetings Last Week', mtLW,            attainEmoji(mtLW, mwT))}
+      ${card('Offers Last Week',   ofLW,            attainEmoji(ofLW, owT))}
+      ${card('Conversion QTD',     (conv * 100).toFixed(1) + '%', 'offers → closed won')}
+    </div>
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+      ${chartBox('Cash-In vs Quarterly Pace',  `c-cash-${ae.id}`,   260)}
+      ${chartBox('Meetings vs Quarterly Pace', `c-meet-${ae.id}`,   260)}
+      ${chartBox('Offers Sent per Week',       `c-offers-${ae.id}`, 220)}
+      ${chartBox('Pipeline Snapshot',          `c-pipe-${ae.id}`,   220)}
+    </div>`;
+
+  document.getElementById('panels').appendChild(div);
+}
+
+function initAECharts(ae, p, manual) {
+  const tgt    = manual.per_ae[ae.id] || {};
+  const cqT    = tgt.cash_in_quarterly || 0;
+  const mwT    = tgt.weekly_meetings   || 0;
+  const n      = p.numWeeks;
+
+  paceChart(`c-cash-${ae.id}`,  p.cwCum.labels,
+    [{ label: ae.name, data: p.cwCum[ae.id], color: ae.color }],
+    paceArr(cqT, n), fmtEur);
+
+  paceChart(`c-meet-${ae.id}`, p.mtCum.labels,
+    [{ label: ae.name, data: p.mtCum[ae.id], color: ae.color }],
+    paceArr(mwT * n, n), v => v);
+
+  stackedBar(`c-offers-${ae.id}`, p.ofWeekly.labels,
+    [{ label: 'Offers', data: p.ofWeekly[ae.id], color: ae.color }],
+    v => v, p.currentWeekIdx);
+
+  pipelineChart(`c-pipe-${ae.id}`, p.pipelineSnapshot, [ae.id]);
+}
+
+// ─── Tab navigation ────────────────────────────────────────────────────────
+function initTabs() {
+  const nav = document.getElementById('tab-nav');
+  AE_LIST.forEach(ae => {
+    const btn = document.createElement('button');
+    btn.className = 'tab-btn px-4 py-1.5 rounded-lg text-sm font-medium text-slate-600';
+    btn.dataset.tab = ae.id;
+    btn.textContent = ae.short;
+    nav.appendChild(btn);
+  });
+
+  nav.addEventListener('click', e => {
+    const btn = e.target.closest('[data-tab]');
+    if (!btn) return;
+    nav.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    document.querySelectorAll('[data-panel]').forEach(p => p.classList.add('hidden'));
+    document.querySelector(`[data-panel="${btn.dataset.tab}"]`)?.classList.remove('hidden');
+  });
+}
+
+// ─── Boot ──────────────────────────────────────────────────────────────────
+Promise.all([
+  fetch('data.json').then(r => r.json()),
+  fetch('manual-data.json').then(r => r.json()),
+]).then(([data, manual]) => {
+  document.getElementById('header-subtitle').textContent =
+    `${manual.quarter}  ·  Updated ${new Date(data.updated_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: '2-digit' })}`;
+
+  initTabs();
+
+  const p = process(data, manual);
+  renderTeam(p, manual);
+  AE_LIST.forEach(ae => renderAE(ae, p, manual));
+
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    initTeamCharts(p, manual);
+    AE_LIST.forEach(ae => initAECharts(ae, p, manual));
+  }));
+}).catch(err => {
+  document.getElementById('header-subtitle').textContent = 'No data — run node sync.js to populate';
+  document.getElementById('panel-team').innerHTML = `
+    <div class="bg-white rounded-xl p-8 text-center shadow-sm">
+      <p class="text-slate-600 text-sm font-medium mb-2">No data available yet</p>
+      <p class="text-slate-400 text-xs">Run <code class="bg-secondary-100 px-1.5 py-0.5 rounded">node sync.js</code> to pull data from HubSpot, then refresh.</p>
+      <p class="text-slate-300 text-xs mt-3">${err.message}</p>
+    </div>`;
+});
+</script>
+</body>
+</html>
