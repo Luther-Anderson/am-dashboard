@@ -70,8 +70,8 @@ const AE_LIST = [
   { id: '87073113', name: 'Manuel Martinez',    short: 'Manuel',  color: '#22c55e' },
   { id: '89389021', name: 'Omri Daniel',        short: 'Omri',    color: '#f43f5e' },
 ];
-const PACE_COLOR  = '#94a3b8';
-const TEAM_COLOR  = '#1e293b';
+const PACE_COLOR = '#94a3b8';
+const TEAM_COLOR = '#1e293b';
 
 Chart.defaults.font.family = 'Inter';
 Chart.defaults.color = '#64748b';
@@ -91,7 +91,6 @@ function getQuarterWeeks(start, end) {
   const s = new Date(start + 'T00:00:00Z');
   const e = new Date(end   + 'T00:00:00Z');
   const day = s.getUTCDay();
-  // First Monday ON OR AFTER quarter start
   const daysAhead = day === 1 ? 0 : (8 - day) % 7;
   const mon = new Date(s);
   mon.setUTCDate(s.getUTCDate() + daysAhead);
@@ -127,12 +126,10 @@ function process(data, manual) {
   const today    = new Date();
   const todayW   = weekStart(today.toISOString().split('T')[0]);
 
-  // Complete weeks (ended before today's Monday)
   const completeWeeks = qWeeks.filter(w => w < todayW);
-  const lastWeek = completeWeeks.at(-1) || null;
+  const lastWeek      = completeWeeks.at(-1) || null;
   const currentWeekIdx = qWeeks.indexOf(todayW);
 
-  // week+owner maps  { [week]: { [ownerId]: value } }
   function toMap(records, valueKey) {
     const m = {};
     for (const r of records) {
@@ -141,11 +138,10 @@ function process(data, manual) {
     }
     return m;
   }
-  const cwMap  = toMap(data.closed_won,  'amount');
-  const ofMap  = toMap(data.offers_sent, 'count');
-  const mtMap  = toMap(data.meetings,    'count');
+  const cwMap = toMap(data.closed_won,  'amount');
+  const ofMap = toMap(data.offers_sent, 'count');
+  const mtMap = toMap(data.meetings,    'count');
 
-  // QTD totals per AE
   function qtd(map) {
     const t = {};
     for (const [, owners] of Object.entries(map))
@@ -157,21 +153,18 @@ function process(data, manual) {
   const offersQtd   = qtd(ofMap);
   const meetingsQtd = qtd(mtMap);
 
-  // Last-week per AE
-  const cashInLW   = lastWeek ? (cwMap[lastWeek]  || {}) : {};
-  const offersLW   = lastWeek ? (ofMap[lastWeek]  || {}) : {};
-  const meetingsLW = lastWeek ? (mtMap[lastWeek]  || {}) : {};
+  const cashInLW   = lastWeek ? (cwMap[lastWeek] || {}) : {};
+  const offersLW   = lastWeek ? (ofMap[lastWeek] || {}) : {};
+  const meetingsLW = lastWeek ? (mtMap[lastWeek] || {}) : {};
 
-  // Team totals
   const sum = obj => Object.values(obj).reduce((a, b) => a + b, 0);
-  const teamCashQtd  = sum(cashInQtd);
-  const teamOfQtd    = sum(offersQtd);
-  const teamMtQtd    = sum(meetingsQtd);
-  const teamCashLW   = sum(cashInLW);
-  const teamOfLW     = sum(offersLW);
-  const teamMtLW     = sum(meetingsLW);
+  const teamCashQtd = sum(cashInQtd);
+  const teamOfQtd   = sum(offersQtd);
+  const teamMtQtd   = sum(meetingsQtd);
+  const teamCashLW  = sum(cashInLW);
+  const teamOfLW    = sum(offersLW);
+  const teamMtLW    = sum(meetingsLW);
 
-  // Conversion rate: closed-won count / offers sent count (QTD)
   const cwCount = {};
   for (const r of data.closed_won) cwCount[r.owner_id] = (cwCount[r.owner_id] || 0) + (r.count || 1);
   const convRate = {};
@@ -179,8 +172,6 @@ function process(data, manual) {
     convRate[ae.id] = (offersQtd[ae.id] || 0) > 0 ? (cwCount[ae.id] || 0) / offersQtd[ae.id] : 0;
   const teamConv = teamOfQtd > 0 ? sum(cwCount) / teamOfQtd : 0;
 
-  // Cumulative weekly: { labels, team: [...], [ownerId]: [...] }
-  // Weeks after todayW get null so the line stops at the current week
   function cumulative(map, weeks) {
     const running = {};
     let teamRun = 0;
@@ -209,7 +200,6 @@ function process(data, manual) {
   const mtCum = cumulative(mtMap, qWeeks);
   const ofCum = cumulative(ofMap, qWeeks);
 
-  // Weekly bars per AE: { labels, [ownerId]: [...] }
   function weekly(map, weeks) {
     const out = { labels: weeks.map(fmtWeek) };
     for (const ae of AE_LIST)
@@ -219,23 +209,95 @@ function process(data, manual) {
   const ofWeekly = weekly(ofMap, qWeeks);
   const mtWeekly = weekly(mtMap, qWeeks);
 
-  // Pace lines
   const teamCashPace = paceArr(manual.team.cash_in_quarterly_target, numWeeks);
   const teamMtPace   = paceArr(manual.team.weekly_meetings_target * numWeeks, numWeeks);
   const teamOfPace   = paceArr(manual.team.weekly_offers_target   * numWeeks, numWeeks);
 
   return {
     qWeeks, numWeeks, lastWeek, currentWeekIdx,
-    // QTD
     cashInQtd, offersQtd, meetingsQtd, convRate,
     teamCashQtd, teamOfQtd, teamMtQtd, teamConv,
-    // Last week
     cashInLW, offersLW, meetingsLW,
     teamCashLW, teamOfLW, teamMtLW,
-    // Chart data
     cwCum, mtCum, ofCum, ofWeekly, mtWeekly,
     teamCashPace, teamMtPace, teamOfPace,
     pipelineSnapshot: data.pipeline_snapshot,
+  };
+}
+
+function processQ1(q1Data, q1Manual) {
+  const qWeeks   = getQuarterWeeks(q1Manual.quarter_start, q1Manual.quarter_end);
+  const numWeeks = qWeeks.length;
+
+  function toMap(records, valueKey) {
+    const m = {};
+    for (const r of records) {
+      if (!m[r.week]) m[r.week] = {};
+      m[r.week][r.owner_id] = (m[r.week][r.owner_id] || 0) + (r[valueKey] || 0);
+    }
+    return m;
+  }
+  const cwMap = toMap(q1Data.closed_won,  'amount');
+  const ofMap = toMap(q1Data.offers_sent, 'count');
+  const mtMap = toMap(q1Data.meetings,    'count');
+
+  function qtd(map) {
+    const t = {};
+    for (const [, owners] of Object.entries(map))
+      for (const [id, v] of Object.entries(owners))
+        t[id] = (t[id] || 0) + v;
+    return t;
+  }
+  const cashInQtd   = qtd(cwMap);
+  const offersQtd   = qtd(ofMap);
+  const meetingsQtd = qtd(mtMap);
+
+  const cwCount = {};
+  for (const r of q1Data.closed_won) cwCount[r.owner_id] = (cwCount[r.owner_id] || 0) + (r.count || 0);
+
+  const sum = obj => Object.values(obj).reduce((a, b) => a + b, 0);
+  const teamCashFinal = sum(cashInQtd);
+  const teamOfFinal   = sum(offersQtd);
+  const teamMtFinal   = sum(meetingsQtd);
+  const teamConv      = teamOfFinal > 0 ? sum(cwCount) / teamOfFinal : 0;
+
+  const convRate = {};
+  for (const ae of AE_LIST)
+    convRate[ae.id] = (offersQtd[ae.id] || 0) > 0 ? (cwCount[ae.id] || 0) / offersQtd[ae.id] : 0;
+
+  // All Q1 weeks are complete — team line sums ALL AEs (incl. Celia, Samet)
+  function cumulative(map, weeks) {
+    const running = {};
+    let teamRun = 0;
+    const out = { labels: weeks.map(fmtWeek), team: [] };
+    for (const ae of AE_LIST) out[ae.id] = [];
+    for (const w of weeks) {
+      const wd = map[w] || {};
+      for (const ae of AE_LIST) {
+        const v = wd[ae.id] || 0;
+        running[ae.id] = (running[ae.id] || 0) + v;
+        out[ae.id].push(running[ae.id]);
+      }
+      const weekTotal = Object.values(wd).reduce((a, b) => a + b, 0);
+      teamRun += weekTotal;
+      out.team.push(teamRun);
+    }
+    return out;
+  }
+  const cwCum = cumulative(cwMap, qWeeks);
+  const mtCum = cumulative(mtMap, qWeeks);
+  const ofCum = cumulative(ofMap, qWeeks);
+
+  const teamCashPace = paceArr(q1Manual.team.cash_in_quarterly_target, numWeeks);
+  const teamMtPace   = paceArr(q1Manual.team.weekly_meetings_target * numWeeks, numWeeks);
+  const teamOfPace   = paceArr(q1Manual.team.weekly_offers_target   * numWeeks, numWeeks);
+
+  return {
+    qWeeks, numWeeks,
+    cashInQtd, offersQtd, meetingsQtd, convRate,
+    teamCashFinal, teamOfFinal, teamMtFinal, teamConv,
+    cwCum, mtCum, ofCum,
+    teamCashPace, teamMtPace, teamOfPace,
   };
 }
 
@@ -252,7 +314,7 @@ const baseOpts = () => ({
   responsive: true,
   maintainAspectRatio: false,
   plugins: {
-    legend: { position: 'top', labels: { boxWidth: 8, pointStyle: 'circle', usePointStyle: true, font: { size: 11 }, padding: 12 } },
+    legend: { position: 'top', labels: { boxWidth: 8, pointStyle: 'circle', usePointStyle: true, font: { size: 11 }, padding: 12, generateLabels: function(chart) { return chart.data.datasets.map((ds, i) => { const meta = chart.getDatasetMeta(i); const hidden = meta.hidden === true || (meta.hidden === null && ds.hidden === true); return { text: ds.label, fillStyle: ds.borderColor || ds.backgroundColor, strokeStyle: ds.borderColor || ds.backgroundColor, lineWidth: 0, pointStyle: 'circle', hidden: false, datasetIndex: i, fontColor: hidden ? '#94a3b8' : '#334155' }; }); }, color: '#334155' }, onClick: function(e, legendItem, legend) { const idx = legendItem.datasetIndex; const meta = legend.chart.getDatasetMeta(idx); meta.hidden = meta.hidden === null ? true : !meta.hidden; legend.chart.update(); } },
     datalabels: { display: false },
     tooltip: { backgroundColor: '#1c1917', titleColor: '#e7e5e4', bodyColor: '#d6d3d1', padding: 10, cornerRadius: 8 },
   },
@@ -272,7 +334,7 @@ function attainFill(data, paceData) {
   return               { line: '#f43f5e', fill: '#f43f5e28' };
 }
 
-function paceChart(id, labels, actuals, paceData, yFmt) {
+function paceChart(id, labels, actuals, paceData, yFmt, q1Overlay = null) {
   const ds = actuals.map(({ label, data }) => {
     const { line, fill } = attainFill(data, paceData);
     return {
@@ -282,15 +344,44 @@ function paceChart(id, labels, actuals, paceData, yFmt) {
     };
   });
   ds.push({
-    label: '— Target pace', data: paceData,
+    label: 'Target pace', data: paceData,
     borderColor: PACE_COLOR, backgroundColor: 'transparent',
     borderWidth: 1.5, borderDash: [6, 4],
     tension: 0, pointRadius: 0, fill: false,
   });
+  if (q1Overlay) {
+    ds.push({
+      label: 'Q1 Comparison',
+      data: q1Overlay,
+      borderColor: '#cbd5e1',
+      backgroundColor: 'transparent',
+      borderWidth: 1.5, borderDash: [3, 3],
+      tension: 0.3, pointRadius: 0, fill: false,
+      hidden: true,
+    });
+  }
   const opts = baseOpts();
   opts.plugins.tooltip.callbacks = { label: c => c.raw !== null ? ` ${c.dataset.label}: ${yFmt(c.raw)}` : null };
   opts.scales.y.ticks.callback = v => yFmt(v);
   mkChart(id, { type: 'line', data: { labels, datasets: ds }, options: opts });
+}
+
+function toggleQ1Overlay(canvasId) {
+  const c = charts[canvasId];
+  if (!c) return;
+  const idx = c.data.datasets.findIndex(d => d.label === 'Q1 Comparison');
+  if (idx < 0) return;
+  const meta = c.getDatasetMeta(idx);
+  // meta.hidden=null means "use dataset.hidden (true)" — treat null/true both as hidden
+  const isHidden = meta.hidden !== false;
+  meta.hidden = !isHidden;
+  const btn = document.querySelector(`[data-q1-toggle="${canvasId}"]`);
+  if (btn) {
+    btn.classList.toggle('text-slate-700', !meta.hidden);
+    btn.classList.toggle('border-slate-400', !meta.hidden);
+    btn.textContent = meta.hidden ? 'Compare Q1' : 'Hide Q1';
+  }
+  c.update();
 }
 
 function stackedBar(id, labels, datasets, yFmt, curIdx) {
@@ -364,18 +455,20 @@ function progressBar(current, target, color) {
   </div>`;
 }
 
-function card(title, value, sub, extra = '') {
+function card(title, value, sub, extra = '', sub2 = '') {
   return `<div class="bg-white rounded-xl p-4 shadow-sm fade-in card-stagger">
     <p class="text-xs font-medium text-slate-400 uppercase tracking-wide leading-none">${title}</p>
     <p class="text-2xl font-semibold text-slate-900 mt-1.5">${value}</p>
-    ${sub ? `<p class="text-xs text-slate-500 mt-0.5">${sub}</p>` : ''}
+    ${sub  ? `<p class="text-xs text-slate-500 mt-0.5">${sub}</p>` : ''}
+    ${sub2 ? `<p class="text-xs mt-0.5">${sub2}</p>` : ''}
     ${extra}
   </div>`;
 }
 
 function narrativeBox(title, icon, items) {
-  const content = (items && items.length)
-    ? `<ul class="space-y-2">${items.map(t => `
+  const arr = Array.isArray(items) ? items.filter(Boolean) : [];
+  const content = arr.length
+    ? `<ul class="space-y-2">${arr.map(t => `
         <li class="flex gap-2 text-sm text-slate-700 leading-snug">
           <span class="text-slate-300 mt-0.5">—</span>
           <span>${t}</span>
@@ -389,57 +482,139 @@ function narrativeBox(title, icon, items) {
 
 function chartBox(title, canvasId, h = 260) {
   return `<div class="bg-white rounded-xl p-4 shadow-sm">
-    <p class="text-sm font-semibold text-slate-700 mb-3">${title}</p>
+    <div class="flex items-center justify-between mb-3">
+      <p class="text-sm font-semibold text-slate-700">${title}</p>
+    </div>
     <div style="height:${h}px"><canvas id="${canvasId}"></canvas></div>
   </div>`;
 }
 
-// ─── Render ────────────────────────────────────────────────────────────────
-function renderTeam(p, manual, data) {
-  const panel = document.getElementById('panel-team');
-  const qt = manual.team.cash_in_quarterly_target;
-  const mtQ = manual.team.weekly_meetings_target * p.numWeeks;
-  const ofQ = manual.team.weekly_offers_target   * p.numWeeks;
-
-  panel.innerHTML = `
-    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 mb-5">
-      ${card('Cash-In QTD',         fmtEur(p.teamCashQtd), `vs ${fmtEur(qt)} Q target`, progressBar(p.teamCashQtd, qt, '#477FFC'))}
-      ${card('Cash-In Last Week',   fmtEur(p.teamCashLW),  attainEmoji(p.teamCashLW, qt / p.numWeeks))}
-      ${card('Meetings Last Week',  p.teamMtLW,            attainEmoji(p.teamMtLW, manual.team.weekly_meetings_target))}
-      ${card('Offers Last Week',    p.teamOfLW,            attainEmoji(p.teamOfLW, manual.team.weekly_offers_target))}
-      ${card('Conversion QTD',      (p.teamConv * 100).toFixed(1) + '%', 'offers → closed won')}
-    </div>
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
-      ${chartBox('Cash-In vs Quarterly Pace',        'c-cash-team',     280)}
-      ${chartBox('Meetings vs Quarterly Pace',      'c-meet-team',     280)}
-      ${chartBox('Offers Sent vs Quarterly Pace',   'c-offers-team',   280)}
-      ${chartBox('Conversion Rate (Team QTD)',       'c-conv-team',     280)}
-    </div>
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-4">
-      ${narrativeBox('Team Highlights', '🏆', data.highlights)}
-      ${narrativeBox('Focus This Week', '🎯', data.focus)}
-    </div>
-    <div class="mt-4">${chartBox('Pipeline Snapshot (€ by Stage)', 'c-pipe-team', 260)}</div>`;
+function sectionHeader(label) {
+  return `<p class="text-xs font-medium text-slate-400 uppercase tracking-widest mb-3 mt-6">${label}</p>`;
 }
 
-function initTeamCharts(p, manual) {
+// ─── Render — Team ─────────────────────────────────────────────────────────
+function renderTeam(p, manual, q1p) {
+  const panel = document.getElementById('panel-team');
+  const qt  = manual.team.cash_in_quarterly_target;
+  const qual = manual.qualitative || {};
+
+  // Q1 delta badge for Cash-In card
+  let q1DeltaSub = '';
+  if (q1p) {
+    const completedIdx = p.lastWeek ? p.qWeeks.indexOf(p.lastWeek) : -1;
+    if (completedIdx >= 0) {
+      const q1Val = q1p.cwCum.team[completedIdx] || 0;
+      const delta = p.teamCashQtd - q1Val;
+      const pct   = q1Val > 0 ? (delta / q1Val * 100).toFixed(0) : 0;
+      const sign  = delta >= 0 ? '+' : '';
+      const col   = delta >= 0 ? '#16a34a' : '#dc2626';
+      q1DeltaSub  = `<span style="color:${col}">${sign}${fmtEur(delta)} vs Q1 W${completedIdx + 1} (${sign}${pct}%)</span>`;
+    }
+  }
+
+  panel.innerHTML = `
+    ${sectionHeader('Financial')}
+    <div class="grid grid-cols-2 gap-3 mb-4">
+      ${card('Cash-In QTD Q2',     fmtEur(p.teamCashQtd), `vs ${fmtEur(qt)} Q target`, progressBar(p.teamCashQtd, qt, '#477FFC'), q1DeltaSub)}
+      ${card('Cash-In Last Week', fmtEur(p.teamCashLW),  attainEmoji(p.teamCashLW, qt / p.numWeeks))}
+    </div>
+    <div class="mb-6">
+      ${chartBox('Cash-In vs Quarterly Pace', 'c-cash-team', 280)}
+    </div>
+
+    ${sectionHeader('Operational')}
+    <div class="grid grid-cols-3 gap-3 mb-4">
+      ${card('Meetings Last Week', p.teamMtLW, attainEmoji(p.teamMtLW, manual.team.weekly_meetings_target))}
+      ${card('Offers Last Week',   p.teamOfLW, attainEmoji(p.teamOfLW, manual.team.weekly_offers_target))}
+      ${card('Conversion QTD',     (p.teamConv * 100).toFixed(1) + '%', 'offers → closed won')}
+    </div>
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
+      ${chartBox('Meetings vs Quarterly Pace',    'c-meet-team',   280)}
+      ${chartBox('Offers Sent vs Quarterly Pace', 'c-offers-team', 280)}
+    </div>
+
+    ${sectionHeader('Qualitative')}
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+      ${narrativeBox('Team Highlights',  '🏆', qual.team_highlights)}
+      ${narrativeBox('Focus This Week',  '🎯', qual.focus_this_week)}
+      ${narrativeBox('Main Blockers',    '🚧', qual.main_blockers)}
+      ${narrativeBox('Additional Notes', '📝', qual.additional_notes)}
+    </div>
+
+    <div>${chartBox('Pipeline Snapshot (€ by Stage)', 'c-pipe-team', 260)}</div>
+    <div class="flex flex-wrap gap-x-6 gap-y-1 mt-2 text-[10px] text-slate-400">
+      <span><b class="text-slate-500">Explored</b> = First Exploration Meeting completed</span>
+      <span><b class="text-slate-500">Advised</b> = Demo done &amp; Offer Sent — Waiting for an answer</span>
+      <span><b class="text-slate-500">Offer Signed</b> = Quote signed but cash not in yet</span>
+    </div>`;
+}
+
+function initTeamCharts(p, manual, q1p) {
   paceChart('c-cash-team', p.cwCum.labels,
-    [{ label: 'Team', data: p.cwCum.team, color: TEAM_COLOR }],
-    p.teamCashPace, fmtEur);
+    [{ label: 'Team Achieved', data: p.cwCum.team }],
+    p.teamCashPace, fmtEur,
+    q1p ? q1p.cwCum.team : null);
 
   paceChart('c-meet-team', p.mtCum.labels,
-    [{ label: 'Team', data: p.mtCum.team, color: TEAM_COLOR }],
-    p.teamMtPace, v => v);
+    [{ label: 'Team Achieved', data: p.mtCum.team }],
+    p.teamMtPace, v => v,
+    q1p ? q1p.mtCum.team : null);
 
   paceChart('c-offers-team', p.ofCum.labels,
-    [{ label: 'Team', data: p.ofCum.team, color: TEAM_COLOR }],
-    p.teamOfPace, v => v);
-
-  conversionChart('c-conv-team', ['Team'], [p.teamConv], [TEAM_COLOR]);
+    [{ label: 'Team Achieved', data: p.ofCum.team }],
+    p.teamOfPace, v => v,
+    q1p ? q1p.ofCum.team : null);
 
   pipelineChart('c-pipe-team', p.pipelineSnapshot, null);
 }
 
+// ─── Render — Q1 Historical Tab ────────────────────────────────────────────
+function renderQ1Tab(q1p, q1Manual) {
+  const qt  = q1Manual.team.cash_in_quarterly_target;
+  const mtQ = q1Manual.team.weekly_meetings_target * q1p.numWeeks;
+  const ofQ = q1Manual.team.weekly_offers_target   * q1p.numWeeks;
+
+  const div = document.createElement('div');
+  div.id = 'panel-q1';
+  div.setAttribute('data-panel', 'q1');
+  div.classList.add('hidden');
+
+  div.innerHTML = `
+    <div class="inline-flex items-center gap-1.5 text-xs font-medium text-slate-400 bg-slate-100 px-2.5 py-1 rounded mb-5">
+      📅&nbsp; Q1 2026 — Final Results (Jan – Mar) · Full team: Alberto · Celia · Jakob · Manuel · Samet · Omri
+    </div>
+
+    ${sectionHeader('Financial')}
+    <div class="grid grid-cols-2 gap-3 mb-4">
+      ${card('Cash-In Q1 Final', fmtEur(q1p.teamCashFinal), `vs ${fmtEur(qt)} target`, progressBar(q1p.teamCashFinal, qt, '#477FFC'))}
+      ${card('Cash-In Attainment', (q1p.teamCashFinal / qt * 100).toFixed(0) + '%', attainEmoji(q1p.teamCashFinal, qt))}
+    </div>
+    <div class="mb-6">
+      ${chartBox('Cash-In Q1 — Full Quarter', 'c-cash-q1', 280)}
+    </div>
+
+    ${sectionHeader('Operational')}
+    <div class="grid grid-cols-3 gap-3 mb-4">
+      ${card('Meetings Q1 Total', q1p.teamMtFinal, attainEmoji(q1p.teamMtFinal, mtQ))}
+      ${card('Offers Q1 Total',   q1p.teamOfFinal, attainEmoji(q1p.teamOfFinal, ofQ))}
+      ${card('Conversion Q1',     (q1p.teamConv * 100).toFixed(1) + '%', 'offers → closed won')}
+    </div>
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+      ${chartBox('Meetings Q1 — Full Quarter', 'c-meet-q1', 280)}
+      ${chartBox('Offers Q1 — Full Quarter',   'c-offers-q1', 280)}
+    </div>`;
+
+  document.getElementById('panels').appendChild(div);
+}
+
+function initQ1Charts(q1p) {
+  paceChart('c-cash-q1',   q1p.cwCum.labels, [{ label: 'Team Achieved', data: q1p.cwCum.team }], q1p.teamCashPace, fmtEur);
+  paceChart('c-meet-q1',   q1p.mtCum.labels, [{ label: 'Team Achieved', data: q1p.mtCum.team }], q1p.teamMtPace, v => v);
+  paceChart('c-offers-q1', q1p.ofCum.labels, [{ label: 'Team Achieved', data: q1p.ofCum.team }], q1p.teamOfPace, v => v);
+}
+
+// ─── Render — AE tabs ──────────────────────────────────────────────────────
 function renderAE(ae, p, manual) {
   const tgt  = manual.per_ae[ae.id] || {};
   const cqT  = tgt.cash_in_quarterly || 0;
@@ -447,12 +622,10 @@ function renderAE(ae, p, manual) {
   const owT  = tgt.weekly_offers     || 0;
 
   const cashQ  = p.cashInQtd[ae.id]  || 0;
-  const offQ   = p.offersQtd[ae.id]  || 0;
-  const mtQ    = p.meetingsQtd[ae.id] || 0;
-  const conv   = p.convRate[ae.id]    || 0;
-  const cashLW = p.cashInLW[ae.id]    || 0;
-  const mtLW   = p.meetingsLW[ae.id]  || 0;
-  const ofLW   = p.offersLW[ae.id]    || 0;
+  const conv   = p.convRate[ae.id]   || 0;
+  const cashLW = p.cashInLW[ae.id]   || 0;
+  const mtLW   = p.meetingsLW[ae.id] || 0;
+  const ofLW   = p.offersLW[ae.id]   || 0;
 
   const div = document.createElement('div');
   div.id = `panel-${ae.id}`;
@@ -460,39 +633,53 @@ function renderAE(ae, p, manual) {
   div.classList.add('hidden');
 
   div.innerHTML = `
-    <div class="flex items-center gap-2 mb-4">
+    <div class="flex items-center gap-2 mb-5">
       <div class="w-2.5 h-2.5 rounded-full" style="background:${ae.color}"></div>
       <h2 class="text-base font-semibold text-slate-800">${ae.name}</h2>
     </div>
-    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 mb-5">
-      ${card('Cash-In QTD',       fmtEur(cashQ),   `vs ${fmtEur(cqT)} Q target`, progressBar(cashQ, cqT, ae.color))}
-      ${card('Cash-In Last Week', fmtEur(cashLW),  attainEmoji(cashLW, cqT / p.numWeeks))}
-      ${card('Meetings Last Week', mtLW,            attainEmoji(mtLW, mwT))}
-      ${card('Offers Last Week',   ofLW,            attainEmoji(ofLW, owT))}
-      ${card('Conversion QTD',     (conv * 100).toFixed(1) + '%', 'offers → closed won')}
+
+    ${sectionHeader('Financial')}
+    <div class="grid grid-cols-2 gap-3 mb-4">
+      ${card('Cash-In QTD',       fmtEur(cashQ),  `vs ${fmtEur(cqT)} Q target`, progressBar(cashQ, cqT, ae.color))}
+      ${card('Cash-In Last Week', fmtEur(cashLW), attainEmoji(cashLW, cqT / p.numWeeks))}
     </div>
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
-      ${chartBox('Cash-In vs Quarterly Pace',  `c-cash-${ae.id}`,   260)}
+    <div class="mb-6">
+      ${chartBox('Cash-In vs Quarterly Pace', `c-cash-${ae.id}`, 260)}
+    </div>
+
+    ${sectionHeader('Operational')}
+    <div class="grid grid-cols-3 gap-3 mb-4">
+      ${card('Meetings Last Week', mtLW,                                attainEmoji(mtLW, mwT))}
+      ${card('Offers Last Week',   ofLW,                                attainEmoji(ofLW, owT))}
+      ${card('Conversion QTD',     (conv * 100).toFixed(1) + '%',       'offers → closed won')}
+    </div>
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
       ${chartBox('Meetings vs Quarterly Pace', `c-meet-${ae.id}`,   260)}
       ${chartBox('Offers Sent per Week',       `c-offers-${ae.id}`, 220)}
-      ${chartBox('Pipeline Snapshot',          `c-pipe-${ae.id}`,   220)}
-    </div>`;
+    </div>
+    <div>${chartBox('Pipeline Snapshot', `c-pipe-${ae.id}`, 220)}</div>
+    <div class="flex flex-wrap gap-x-6 gap-y-1 mt-2 text-[10px] text-slate-400">
+      <span><b class="text-slate-500">Explored</b> = First Exploration Meeting completed</span>
+      <span><b class="text-slate-500">Advised</b> = Demo done &amp; Offer Sent — Waiting for an answer</span>
+      <span><b class="text-slate-500">Offer Signed</b> = Quote signed but cash not in yet</span>
+    </div>
+    ${tgt.notes && tgt.notes.length ? `<div class="mt-4">${narrativeBox('Notes', '📝', Array.isArray(tgt.notes) ? tgt.notes : [tgt.notes])}</div>` : ''}`;
 
   document.getElementById('panels').appendChild(div);
 }
 
 function initAECharts(ae, p, manual) {
-  const tgt    = manual.per_ae[ae.id] || {};
-  const cqT    = tgt.cash_in_quarterly || 0;
-  const mwT    = tgt.weekly_meetings   || 0;
-  const n      = p.numWeeks;
+  const tgt = manual.per_ae[ae.id] || {};
+  const cqT = tgt.cash_in_quarterly || 0;
+  const mwT = tgt.weekly_meetings   || 0;
+  const n   = p.numWeeks;
 
-  paceChart(`c-cash-${ae.id}`,  p.cwCum.labels,
-    [{ label: ae.name, data: p.cwCum[ae.id], color: ae.color }],
+  paceChart(`c-cash-${ae.id}`, p.cwCum.labels,
+    [{ label: ae.name, data: p.cwCum[ae.id] }],
     paceArr(cqT, n), fmtEur);
 
   paceChart(`c-meet-${ae.id}`, p.mtCum.labels,
-    [{ label: ae.name, data: p.mtCum[ae.id], color: ae.color }],
+    [{ label: ae.name, data: p.mtCum[ae.id] }],
     paceArr(mwT * n, n), v => v);
 
   stackedBar(`c-offers-${ae.id}`, p.ofWeekly.labels,
@@ -503,8 +690,17 @@ function initAECharts(ae, p, manual) {
 }
 
 // ─── Tab navigation ────────────────────────────────────────────────────────
-function initTabs() {
+function initTabs(hasQ1) {
   const nav = document.getElementById('tab-nav');
+
+  if (hasQ1) {
+    const q1btn = document.createElement('button');
+    q1btn.className = 'tab-btn px-4 py-1.5 rounded-lg text-sm font-medium text-slate-600';
+    q1btn.dataset.tab = 'q1';
+    q1btn.textContent = 'Q1-2026';
+    nav.appendChild(q1btn);
+  }
+
   AE_LIST.forEach(ae => {
     const btn = document.createElement('button');
     btn.className = 'tab-btn px-4 py-1.5 rounded-lg text-sm font-medium text-slate-600';
@@ -525,28 +721,33 @@ function initTabs() {
 
 // ─── Boot ──────────────────────────────────────────────────────────────────
 Promise.all([
-  fetch('data.json').then(r => r.json()),
-  fetch('manual-data.json').then(r => r.json()),
-]).then(([data, manual]) => {
+  fetch('data.json?v=' + Date.now()).then(r => r.json()),
+  fetch('manual-data.json?v=' + Date.now()).then(r => r.json()),
+  fetch('q1-data.json?v=' + Date.now()).then(r => r.json()).catch(() => null),
+]).then(([data, manual, q1Data]) => {
   document.getElementById('header-subtitle').textContent =
     `${manual.quarter}  ·  Updated ${new Date(data.updated_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: '2-digit' })}`;
 
-  initTabs();
+  const q1p = (q1Data && manual.q1) ? processQ1(q1Data, manual.q1) : null;
+
+  initTabs(!!q1p);
 
   const p = process(data, manual);
-  renderTeam(p, manual, data);
+  renderTeam(p, manual, q1p);
   AE_LIST.forEach(ae => renderAE(ae, p, manual));
+  if (q1p) renderQ1Tab(q1p, manual.q1);
 
   requestAnimationFrame(() => requestAnimationFrame(() => {
-    initTeamCharts(p, manual);
+    initTeamCharts(p, manual, q1p);
     AE_LIST.forEach(ae => initAECharts(ae, p, manual));
+    if (q1p) initQ1Charts(q1p);
   }));
 }).catch(err => {
-  document.getElementById('header-subtitle').textContent = 'No data — run node sync.js to populate';
+  document.getElementById('header-subtitle').textContent = 'No data — refresh dashboard to populate';
   document.getElementById('panel-team').innerHTML = `
     <div class="bg-white rounded-xl p-8 text-center shadow-sm">
       <p class="text-slate-600 text-sm font-medium mb-2">No data available yet</p>
-      <p class="text-slate-400 text-xs">Run <code class="bg-secondary-100 px-1.5 py-0.5 rounded">node sync.js</code> to pull data from HubSpot, then refresh.</p>
+      <p class="text-slate-400 text-xs">Ask Claude to refresh the dashboard from the latest KPI spreadsheet.</p>
       <p class="text-slate-300 text-xs mt-3">${err.message}</p>
     </div>`;
 });

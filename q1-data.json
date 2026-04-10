@@ -1,0 +1,1084 @@
+{
+  "updated_at": "2026-04-08T00:00:00.000Z",
+  "quarter": "Q1-2026",
+  "quarter_start": "2026-01-01",
+  "quarter_end": "2026-03-31",
+  "note": "Sourced from 2026-Q1 - Sortlist KPIs (9).xlsx \u2014 Sales Financial & Sales Operational tabs. Comparable team: Alberto, Jakob, Manuel, Omri only.",
+  "closed_won": [
+    {
+      "week": "2026-01-12",
+      "owner_id": "89389021",
+      "owner_name": "Omri Daniel",
+      "count": 2,
+      "amount": 833
+    },
+    {
+      "week": "2026-01-19",
+      "owner_id": "89389021",
+      "owner_name": "Omri Daniel",
+      "count": 1,
+      "amount": 0
+    },
+    {
+      "week": "2026-02-02",
+      "owner_id": "76991650",
+      "owner_name": "Alberto Marchetti",
+      "count": 2,
+      "amount": 2632
+    },
+    {
+      "week": "2026-02-02",
+      "owner_id": "89389021",
+      "owner_name": "Omri Daniel",
+      "count": 1,
+      "amount": 99
+    },
+    {
+      "week": "2026-02-09",
+      "owner_id": "76991650",
+      "owner_name": "Alberto Marchetti",
+      "count": 1,
+      "amount": 0
+    },
+    {
+      "week": "2026-02-16",
+      "owner_id": "89389021",
+      "owner_name": "Omri Daniel",
+      "count": 0,
+      "amount": 1880
+    },
+    {
+      "week": "2026-02-23",
+      "owner_id": "76991650",
+      "owner_name": "Alberto Marchetti",
+      "count": 1,
+      "amount": 2500
+    },
+    {
+      "week": "2026-02-23",
+      "owner_id": "89389021",
+      "owner_name": "Omri Daniel",
+      "count": 4,
+      "amount": 0
+    },
+    {
+      "week": "2026-03-02",
+      "owner_id": "76991650",
+      "owner_name": "Alberto Marchetti",
+      "count": 1,
+      "amount": 0
+    },
+    {
+      "week": "2026-03-02",
+      "owner_id": "84528640",
+      "owner_name": "Jakob Hauser",
+      "count": 0,
+      "amount": 1458
+    },
+    {
+      "week": "2026-03-02",
+      "owner_id": "89389021",
+      "owner_name": "Omri Daniel",
+      "count": 1,
+      "amount": 3224
+    },
+    {
+      "week": "2026-03-09",
+      "owner_id": "84528640",
+      "owner_name": "Jakob Hauser",
+      "count": 2,
+      "amount": 2998
+    },
+    {
+      "week": "2026-03-09",
+      "owner_id": "87073113",
+      "owner_name": "Manuel Martinez",
+      "count": 1,
+      "amount": 1084
+    },
+    {
+      "week": "2026-03-09",
+      "owner_id": "89389021",
+      "owner_name": "Omri Daniel",
+      "count": 1,
+      "amount": 833.35
+    },
+    {
+      "week": "2026-03-16",
+      "owner_id": "84528640",
+      "owner_name": "Jakob Hauser",
+      "count": 2,
+      "amount": 3096
+    },
+    {
+      "week": "2026-03-16",
+      "owner_id": "87073113",
+      "owner_name": "Manuel Martinez",
+      "count": 1,
+      "amount": 2392
+    },
+    {
+      "week": "2026-03-16",
+      "owner_id": "89389021",
+      "owner_name": "Omri Daniel",
+      "count": 0,
+      "amount": 3602
+    },
+    {
+      "week": "2026-03-23",
+      "owner_id": "76991650",
+      "owner_name": "Alberto Marchetti",
+      "count": 2,
+      "amount": 4892
+    },
+    {
+      "week": "2026-03-23",
+      "owner_id": "89389021",
+      "owner_name": "Omri Daniel",
+      "count": 1,
+      "amount": 3469
+    },
+    {
+      "week": "2026-03-30",
+      "owner_id": "76991650",
+      "owner_name": "Alberto Marchetti",
+      "count": 1,
+      "amount": 1548
+    },
+    {
+      "week": "2026-03-30",
+      "owner_id": "84528640",
+      "owner_name": "Jakob Hauser",
+      "count": 1,
+      "amount": 2000
+    },
+    {
+      "week": "2026-03-30",
+      "owner_id": "89389021",
+      "owner_name": "Omri Daniel",
+      "count": 2,
+      "amount": 4534
+    },
+    {
+      "week": "2026-01-05",
+      "owner_id": "0",
+      "owner_name": "Samet",
+      "count": 0,
+      "amount": 1548.0
+    },
+    {
+      "week": "2026-01-12",
+      "owner_id": "0",
+      "owner_name": "Samet",
+      "count": 1,
+      "amount": 0
+    },
+    {
+      "week": "2026-01-26",
+      "owner_id": "40312105",
+      "owner_name": "Celia Denouette",
+      "count": 1,
+      "amount": 1161.0
+    },
+    {
+      "week": "2026-02-02",
+      "owner_id": "40312105",
+      "owner_name": "Celia Denouette",
+      "count": 1,
+      "amount": 2664.0
+    },
+    {
+      "week": "2026-02-23",
+      "owner_id": "40312105",
+      "owner_name": "Celia Denouette",
+      "count": 1,
+      "amount": 3096.0
+    },
+    {
+      "week": "2026-03-02",
+      "owner_id": "40312105",
+      "owner_name": "Celia Denouette",
+      "count": 1,
+      "amount": 2000.0
+    },
+    {
+      "week": "2026-03-16",
+      "owner_id": "40312105",
+      "owner_name": "Celia Denouette",
+      "count": 0,
+      "amount": 1548.0
+    },
+    {
+      "week": "2026-03-23",
+      "owner_id": "40312105",
+      "owner_name": "Celia Denouette",
+      "count": 0,
+      "amount": 2400.0
+    },
+    {
+      "week": "2026-03-30",
+      "owner_id": "40312105",
+      "owner_name": "Celia Denouette",
+      "count": 0,
+      "amount": 4788.0
+    }
+  ],
+  "offers_sent": [
+    {
+      "week": "2026-01-12",
+      "owner_id": "76991650",
+      "owner_name": "Alberto Marchetti",
+      "count": 1,
+      "amount": 0
+    },
+    {
+      "week": "2026-01-12",
+      "owner_id": "84528640",
+      "owner_name": "Jakob Hauser",
+      "count": 1,
+      "amount": 0
+    },
+    {
+      "week": "2026-01-12",
+      "owner_id": "89389021",
+      "owner_name": "Omri Daniel",
+      "count": 4,
+      "amount": 0
+    },
+    {
+      "week": "2026-01-19",
+      "owner_id": "76991650",
+      "owner_name": "Alberto Marchetti",
+      "count": 2,
+      "amount": 0
+    },
+    {
+      "week": "2026-01-19",
+      "owner_id": "84528640",
+      "owner_name": "Jakob Hauser",
+      "count": 6,
+      "amount": 0
+    },
+    {
+      "week": "2026-01-19",
+      "owner_id": "87073113",
+      "owner_name": "Manuel Martinez",
+      "count": 1,
+      "amount": 0
+    },
+    {
+      "week": "2026-01-19",
+      "owner_id": "89389021",
+      "owner_name": "Omri Daniel",
+      "count": 7,
+      "amount": 0
+    },
+    {
+      "week": "2026-01-26",
+      "owner_id": "76991650",
+      "owner_name": "Alberto Marchetti",
+      "count": 1,
+      "amount": 0
+    },
+    {
+      "week": "2026-01-26",
+      "owner_id": "84528640",
+      "owner_name": "Jakob Hauser",
+      "count": 2,
+      "amount": 0
+    },
+    {
+      "week": "2026-01-26",
+      "owner_id": "87073113",
+      "owner_name": "Manuel Martinez",
+      "count": 1,
+      "amount": 0
+    },
+    {
+      "week": "2026-01-26",
+      "owner_id": "89389021",
+      "owner_name": "Omri Daniel",
+      "count": 7,
+      "amount": 0
+    },
+    {
+      "week": "2026-02-02",
+      "owner_id": "76991650",
+      "owner_name": "Alberto Marchetti",
+      "count": 2,
+      "amount": 0
+    },
+    {
+      "week": "2026-02-02",
+      "owner_id": "84528640",
+      "owner_name": "Jakob Hauser",
+      "count": 3,
+      "amount": 0
+    },
+    {
+      "week": "2026-02-02",
+      "owner_id": "87073113",
+      "owner_name": "Manuel Martinez",
+      "count": 2,
+      "amount": 0
+    },
+    {
+      "week": "2026-02-02",
+      "owner_id": "89389021",
+      "owner_name": "Omri Daniel",
+      "count": 4,
+      "amount": 0
+    },
+    {
+      "week": "2026-02-09",
+      "owner_id": "76991650",
+      "owner_name": "Alberto Marchetti",
+      "count": 1,
+      "amount": 0
+    },
+    {
+      "week": "2026-02-09",
+      "owner_id": "87073113",
+      "owner_name": "Manuel Martinez",
+      "count": 2,
+      "amount": 0
+    },
+    {
+      "week": "2026-02-09",
+      "owner_id": "89389021",
+      "owner_name": "Omri Daniel",
+      "count": 3,
+      "amount": 0
+    },
+    {
+      "week": "2026-02-16",
+      "owner_id": "76991650",
+      "owner_name": "Alberto Marchetti",
+      "count": 2,
+      "amount": 0
+    },
+    {
+      "week": "2026-02-16",
+      "owner_id": "84528640",
+      "owner_name": "Jakob Hauser",
+      "count": 3,
+      "amount": 0
+    },
+    {
+      "week": "2026-02-16",
+      "owner_id": "87073113",
+      "owner_name": "Manuel Martinez",
+      "count": 4,
+      "amount": 0
+    },
+    {
+      "week": "2026-02-16",
+      "owner_id": "89389021",
+      "owner_name": "Omri Daniel",
+      "count": 3,
+      "amount": 0
+    },
+    {
+      "week": "2026-02-23",
+      "owner_id": "76991650",
+      "owner_name": "Alberto Marchetti",
+      "count": 3,
+      "amount": 0
+    },
+    {
+      "week": "2026-02-23",
+      "owner_id": "84528640",
+      "owner_name": "Jakob Hauser",
+      "count": 4,
+      "amount": 0
+    },
+    {
+      "week": "2026-02-23",
+      "owner_id": "87073113",
+      "owner_name": "Manuel Martinez",
+      "count": 1,
+      "amount": 0
+    },
+    {
+      "week": "2026-02-23",
+      "owner_id": "89389021",
+      "owner_name": "Omri Daniel",
+      "count": 4,
+      "amount": 0
+    },
+    {
+      "week": "2026-03-02",
+      "owner_id": "76991650",
+      "owner_name": "Alberto Marchetti",
+      "count": 3,
+      "amount": 0
+    },
+    {
+      "week": "2026-03-02",
+      "owner_id": "84528640",
+      "owner_name": "Jakob Hauser",
+      "count": 3,
+      "amount": 0
+    },
+    {
+      "week": "2026-03-02",
+      "owner_id": "87073113",
+      "owner_name": "Manuel Martinez",
+      "count": 3,
+      "amount": 0
+    },
+    {
+      "week": "2026-03-02",
+      "owner_id": "89389021",
+      "owner_name": "Omri Daniel",
+      "count": 2,
+      "amount": 0
+    },
+    {
+      "week": "2026-03-09",
+      "owner_id": "76991650",
+      "owner_name": "Alberto Marchetti",
+      "count": 1,
+      "amount": 0
+    },
+    {
+      "week": "2026-03-09",
+      "owner_id": "84528640",
+      "owner_name": "Jakob Hauser",
+      "count": 4,
+      "amount": 0
+    },
+    {
+      "week": "2026-03-09",
+      "owner_id": "87073113",
+      "owner_name": "Manuel Martinez",
+      "count": 4,
+      "amount": 0
+    },
+    {
+      "week": "2026-03-09",
+      "owner_id": "89389021",
+      "owner_name": "Omri Daniel",
+      "count": 2,
+      "amount": 0
+    },
+    {
+      "week": "2026-03-16",
+      "owner_id": "76991650",
+      "owner_name": "Alberto Marchetti",
+      "count": 4,
+      "amount": 0
+    },
+    {
+      "week": "2026-03-16",
+      "owner_id": "84528640",
+      "owner_name": "Jakob Hauser",
+      "count": 4,
+      "amount": 0
+    },
+    {
+      "week": "2026-03-16",
+      "owner_id": "87073113",
+      "owner_name": "Manuel Martinez",
+      "count": 3,
+      "amount": 0
+    },
+    {
+      "week": "2026-03-16",
+      "owner_id": "89389021",
+      "owner_name": "Omri Daniel",
+      "count": 3,
+      "amount": 0
+    },
+    {
+      "week": "2026-03-23",
+      "owner_id": "76991650",
+      "owner_name": "Alberto Marchetti",
+      "count": 4,
+      "amount": 0
+    },
+    {
+      "week": "2026-03-23",
+      "owner_id": "84528640",
+      "owner_name": "Jakob Hauser",
+      "count": 4,
+      "amount": 0
+    },
+    {
+      "week": "2026-03-23",
+      "owner_id": "87073113",
+      "owner_name": "Manuel Martinez",
+      "count": 5,
+      "amount": 0
+    },
+    {
+      "week": "2026-03-23",
+      "owner_id": "89389021",
+      "owner_name": "Omri Daniel",
+      "count": 1,
+      "amount": 0
+    },
+    {
+      "week": "2026-03-30",
+      "owner_id": "84528640",
+      "owner_name": "Jakob Hauser",
+      "count": 1,
+      "amount": 0
+    },
+    {
+      "week": "2026-01-12",
+      "owner_id": "0",
+      "owner_name": "Samet",
+      "count": 1
+    },
+    {
+      "week": "2026-01-19",
+      "owner_id": "0",
+      "owner_name": "Samet",
+      "count": 2
+    },
+    {
+      "week": "2026-01-26",
+      "owner_id": "40312105",
+      "owner_name": "Celia Denouette",
+      "count": 3
+    },
+    {
+      "week": "2026-01-26",
+      "owner_id": "0",
+      "owner_name": "Samet",
+      "count": 1
+    },
+    {
+      "week": "2026-02-02",
+      "owner_id": "40312105",
+      "owner_name": "Celia Denouette",
+      "count": 2
+    },
+    {
+      "week": "2026-02-09",
+      "owner_id": "40312105",
+      "owner_name": "Celia Denouette",
+      "count": 7
+    },
+    {
+      "week": "2026-02-09",
+      "owner_id": "0",
+      "owner_name": "Samet",
+      "count": 1
+    },
+    {
+      "week": "2026-02-16",
+      "owner_id": "40312105",
+      "owner_name": "Celia Denouette",
+      "count": 2
+    },
+    {
+      "week": "2026-02-16",
+      "owner_id": "0",
+      "owner_name": "Samet",
+      "count": 4
+    },
+    {
+      "week": "2026-02-23",
+      "owner_id": "40312105",
+      "owner_name": "Celia Denouette",
+      "count": 6
+    },
+    {
+      "week": "2026-02-23",
+      "owner_id": "0",
+      "owner_name": "Samet",
+      "count": 2
+    },
+    {
+      "week": "2026-03-02",
+      "owner_id": "40312105",
+      "owner_name": "Celia Denouette",
+      "count": 3
+    },
+    {
+      "week": "2026-03-09",
+      "owner_id": "40312105",
+      "owner_name": "Celia Denouette",
+      "count": 5
+    },
+    {
+      "week": "2026-03-09",
+      "owner_id": "0",
+      "owner_name": "Samet",
+      "count": 1
+    },
+    {
+      "week": "2026-03-16",
+      "owner_id": "40312105",
+      "owner_name": "Celia Denouette",
+      "count": 7
+    },
+    {
+      "week": "2026-03-23",
+      "owner_id": "40312105",
+      "owner_name": "Celia Denouette",
+      "count": 6
+    }
+  ],
+  "meetings": [
+    {
+      "week": "2026-01-05",
+      "owner_id": "76991650",
+      "owner_name": "Alberto Marchetti",
+      "count": 1,
+      "amount": 0
+    },
+    {
+      "week": "2026-01-05",
+      "owner_id": "84528640",
+      "owner_name": "Jakob Hauser",
+      "count": 4,
+      "amount": 0
+    },
+    {
+      "week": "2026-01-12",
+      "owner_id": "76991650",
+      "owner_name": "Alberto Marchetti",
+      "count": 7,
+      "amount": 0
+    },
+    {
+      "week": "2026-01-12",
+      "owner_id": "84528640",
+      "owner_name": "Jakob Hauser",
+      "count": 11,
+      "amount": 0
+    },
+    {
+      "week": "2026-01-12",
+      "owner_id": "89389021",
+      "owner_name": "Omri Daniel",
+      "count": 4,
+      "amount": 0
+    },
+    {
+      "week": "2026-01-19",
+      "owner_id": "76991650",
+      "owner_name": "Alberto Marchetti",
+      "count": 10,
+      "amount": 0
+    },
+    {
+      "week": "2026-01-19",
+      "owner_id": "84528640",
+      "owner_name": "Jakob Hauser",
+      "count": 11,
+      "amount": 0
+    },
+    {
+      "week": "2026-01-19",
+      "owner_id": "87073113",
+      "owner_name": "Manuel Martinez",
+      "count": 5,
+      "amount": 0
+    },
+    {
+      "week": "2026-01-19",
+      "owner_id": "89389021",
+      "owner_name": "Omri Daniel",
+      "count": 7,
+      "amount": 0
+    },
+    {
+      "week": "2026-01-26",
+      "owner_id": "76991650",
+      "owner_name": "Alberto Marchetti",
+      "count": 8,
+      "amount": 0
+    },
+    {
+      "week": "2026-01-26",
+      "owner_id": "84528640",
+      "owner_name": "Jakob Hauser",
+      "count": 12,
+      "amount": 0
+    },
+    {
+      "week": "2026-01-26",
+      "owner_id": "87073113",
+      "owner_name": "Manuel Martinez",
+      "count": 9,
+      "amount": 0
+    },
+    {
+      "week": "2026-01-26",
+      "owner_id": "89389021",
+      "owner_name": "Omri Daniel",
+      "count": 7,
+      "amount": 0
+    },
+    {
+      "week": "2026-02-02",
+      "owner_id": "76991650",
+      "owner_name": "Alberto Marchetti",
+      "count": 12,
+      "amount": 0
+    },
+    {
+      "week": "2026-02-02",
+      "owner_id": "84528640",
+      "owner_name": "Jakob Hauser",
+      "count": 8,
+      "amount": 0
+    },
+    {
+      "week": "2026-02-02",
+      "owner_id": "87073113",
+      "owner_name": "Manuel Martinez",
+      "count": 10,
+      "amount": 0
+    },
+    {
+      "week": "2026-02-02",
+      "owner_id": "89389021",
+      "owner_name": "Omri Daniel",
+      "count": 8,
+      "amount": 0
+    },
+    {
+      "week": "2026-02-09",
+      "owner_id": "76991650",
+      "owner_name": "Alberto Marchetti",
+      "count": 12,
+      "amount": 0
+    },
+    {
+      "week": "2026-02-09",
+      "owner_id": "84528640",
+      "owner_name": "Jakob Hauser",
+      "count": 7,
+      "amount": 0
+    },
+    {
+      "week": "2026-02-09",
+      "owner_id": "87073113",
+      "owner_name": "Manuel Martinez",
+      "count": 8,
+      "amount": 0
+    },
+    {
+      "week": "2026-02-09",
+      "owner_id": "89389021",
+      "owner_name": "Omri Daniel",
+      "count": 4,
+      "amount": 0
+    },
+    {
+      "week": "2026-02-16",
+      "owner_id": "76991650",
+      "owner_name": "Alberto Marchetti",
+      "count": 12,
+      "amount": 0
+    },
+    {
+      "week": "2026-02-16",
+      "owner_id": "84528640",
+      "owner_name": "Jakob Hauser",
+      "count": 9,
+      "amount": 0
+    },
+    {
+      "week": "2026-02-16",
+      "owner_id": "87073113",
+      "owner_name": "Manuel Martinez",
+      "count": 10,
+      "amount": 0
+    },
+    {
+      "week": "2026-02-16",
+      "owner_id": "89389021",
+      "owner_name": "Omri Daniel",
+      "count": 7,
+      "amount": 0
+    },
+    {
+      "week": "2026-02-23",
+      "owner_id": "76991650",
+      "owner_name": "Alberto Marchetti",
+      "count": 12,
+      "amount": 0
+    },
+    {
+      "week": "2026-02-23",
+      "owner_id": "84528640",
+      "owner_name": "Jakob Hauser",
+      "count": 10,
+      "amount": 0
+    },
+    {
+      "week": "2026-02-23",
+      "owner_id": "87073113",
+      "owner_name": "Manuel Martinez",
+      "count": 10,
+      "amount": 0
+    },
+    {
+      "week": "2026-02-23",
+      "owner_id": "89389021",
+      "owner_name": "Omri Daniel",
+      "count": 8,
+      "amount": 0
+    },
+    {
+      "week": "2026-03-02",
+      "owner_id": "76991650",
+      "owner_name": "Alberto Marchetti",
+      "count": 7,
+      "amount": 0
+    },
+    {
+      "week": "2026-03-02",
+      "owner_id": "84528640",
+      "owner_name": "Jakob Hauser",
+      "count": 13,
+      "amount": 0
+    },
+    {
+      "week": "2026-03-02",
+      "owner_id": "87073113",
+      "owner_name": "Manuel Martinez",
+      "count": 6,
+      "amount": 0
+    },
+    {
+      "week": "2026-03-02",
+      "owner_id": "89389021",
+      "owner_name": "Omri Daniel",
+      "count": 3,
+      "amount": 0
+    },
+    {
+      "week": "2026-03-09",
+      "owner_id": "76991650",
+      "owner_name": "Alberto Marchetti",
+      "count": 6,
+      "amount": 0
+    },
+    {
+      "week": "2026-03-09",
+      "owner_id": "84528640",
+      "owner_name": "Jakob Hauser",
+      "count": 12,
+      "amount": 0
+    },
+    {
+      "week": "2026-03-09",
+      "owner_id": "87073113",
+      "owner_name": "Manuel Martinez",
+      "count": 11,
+      "amount": 0
+    },
+    {
+      "week": "2026-03-09",
+      "owner_id": "89389021",
+      "owner_name": "Omri Daniel",
+      "count": 6,
+      "amount": 0
+    },
+    {
+      "week": "2026-03-16",
+      "owner_id": "76991650",
+      "owner_name": "Alberto Marchetti",
+      "count": 9,
+      "amount": 0
+    },
+    {
+      "week": "2026-03-16",
+      "owner_id": "84528640",
+      "owner_name": "Jakob Hauser",
+      "count": 17,
+      "amount": 0
+    },
+    {
+      "week": "2026-03-16",
+      "owner_id": "87073113",
+      "owner_name": "Manuel Martinez",
+      "count": 8,
+      "amount": 0
+    },
+    {
+      "week": "2026-03-16",
+      "owner_id": "89389021",
+      "owner_name": "Omri Daniel",
+      "count": 8,
+      "amount": 0
+    },
+    {
+      "week": "2026-03-23",
+      "owner_id": "76991650",
+      "owner_name": "Alberto Marchetti",
+      "count": 7,
+      "amount": 0
+    },
+    {
+      "week": "2026-03-23",
+      "owner_id": "84528640",
+      "owner_name": "Jakob Hauser",
+      "count": 8,
+      "amount": 0
+    },
+    {
+      "week": "2026-03-23",
+      "owner_id": "87073113",
+      "owner_name": "Manuel Martinez",
+      "count": 7,
+      "amount": 0
+    },
+    {
+      "week": "2026-03-23",
+      "owner_id": "89389021",
+      "owner_name": "Omri Daniel",
+      "count": 3,
+      "amount": 0
+    },
+    {
+      "week": "2026-03-30",
+      "owner_id": "76991650",
+      "owner_name": "Alberto Marchetti",
+      "count": 1,
+      "amount": 0
+    },
+    {
+      "week": "2026-03-30",
+      "owner_id": "84528640",
+      "owner_name": "Jakob Hauser",
+      "count": 7,
+      "amount": 0
+    },
+    {
+      "week": "2026-03-30",
+      "owner_id": "87073113",
+      "owner_name": "Manuel Martinez",
+      "count": 2,
+      "amount": 0
+    },
+    {
+      "week": "2026-01-12",
+      "owner_id": "0",
+      "owner_name": "Samet",
+      "count": 1
+    },
+    {
+      "week": "2026-01-19",
+      "owner_id": "40312105",
+      "owner_name": "Celia Denouette",
+      "count": 6
+    },
+    {
+      "week": "2026-01-19",
+      "owner_id": "0",
+      "owner_name": "Samet",
+      "count": 6
+    },
+    {
+      "week": "2026-01-26",
+      "owner_id": "40312105",
+      "owner_name": "Celia Denouette",
+      "count": 9
+    },
+    {
+      "week": "2026-01-26",
+      "owner_id": "0",
+      "owner_name": "Samet",
+      "count": 2
+    },
+    {
+      "week": "2026-02-02",
+      "owner_id": "40312105",
+      "owner_name": "Celia Denouette",
+      "count": 10
+    },
+    {
+      "week": "2026-02-02",
+      "owner_id": "0",
+      "owner_name": "Samet",
+      "count": 4
+    },
+    {
+      "week": "2026-02-09",
+      "owner_id": "40312105",
+      "owner_name": "Celia Denouette",
+      "count": 9
+    },
+    {
+      "week": "2026-02-09",
+      "owner_id": "0",
+      "owner_name": "Samet",
+      "count": 8
+    },
+    {
+      "week": "2026-02-16",
+      "owner_id": "40312105",
+      "owner_name": "Celia Denouette",
+      "count": 6
+    },
+    {
+      "week": "2026-02-16",
+      "owner_id": "0",
+      "owner_name": "Samet",
+      "count": 9
+    },
+    {
+      "week": "2026-02-23",
+      "owner_id": "40312105",
+      "owner_name": "Celia Denouette",
+      "count": 15
+    },
+    {
+      "week": "2026-02-23",
+      "owner_id": "0",
+      "owner_name": "Samet",
+      "count": 5
+    },
+    {
+      "week": "2026-03-02",
+      "owner_id": "40312105",
+      "owner_name": "Celia Denouette",
+      "count": 12
+    },
+    {
+      "week": "2026-03-02",
+      "owner_id": "0",
+      "owner_name": "Samet",
+      "count": 7
+    },
+    {
+      "week": "2026-03-09",
+      "owner_id": "40312105",
+      "owner_name": "Celia Denouette",
+      "count": 13
+    },
+    {
+      "week": "2026-03-09",
+      "owner_id": "0",
+      "owner_name": "Samet",
+      "count": 7
+    },
+    {
+      "week": "2026-03-16",
+      "owner_id": "40312105",
+      "owner_name": "Celia Denouette",
+      "count": 17
+    },
+    {
+      "week": "2026-03-23",
+      "owner_id": "40312105",
+      "owner_name": "Celia Denouette",
+      "count": 19
+    },
+    {
+      "week": "2026-03-30",
+      "owner_id": "40312105",
+      "owner_name": "Celia Denouette",
+      "count": 9
+    }
+  ],
+  "pipeline_snapshot": []
+}

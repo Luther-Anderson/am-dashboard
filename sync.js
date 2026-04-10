@@ -92,6 +92,63 @@ function bucket(records, dateFn, ownerFn, amountFn = () => 0) {
   return Object.values(map).sort((a, b) => a.week.localeCompare(b.week));
 }
 
+// ── Q1 historical fetch helper ──────────────────────────────────────────────
+const Q1_START = '2026-01-01';
+const Q1_END   = '2026-03-31';
+const Q1_FILE  = './q1-data.json';
+
+async function fetchAndWriteQ1() {
+  const startMs = new Date(Q1_START + 'T00:00:00Z').getTime();
+  const endMs   = new Date(Q1_END   + 'T23:59:59Z').getTime();
+  const advisedProp = `hs_v2_date_entered_${STAGE.ADVISED}`;
+  const MEETING_TYPES = ['qualification', 'explore', 'advise', 'close'];
+
+  console.log('\n🕐  Fetching Q1-2026 historical data...');
+
+  const [cwDeals, offDeals, allMtgs] = await Promise.all([
+    searchAll('deals', {
+      filterGroups: [{ filters: [
+        { propertyName: 'pipeline',         operator: 'EQ',  value: 'default' },
+        { propertyName: 'dealstage',        operator: 'EQ',  value: STAGE.CLOSED_WON },
+        { propertyName: 'hubspot_owner_id', operator: 'IN',  values: AE_IDS },
+        { propertyName: 'closedate',        operator: 'GTE', value: String(startMs) },
+        { propertyName: 'closedate',        operator: 'LTE', value: String(endMs) },
+      ]}],
+      properties: ['amount', 'closedate', 'hubspot_owner_id'],
+    }),
+    searchAll('deals', {
+      filterGroups: [{ filters: [
+        { propertyName: 'pipeline',         operator: 'EQ',  value: 'default' },
+        { propertyName: 'hubspot_owner_id', operator: 'IN',  values: AE_IDS },
+        { propertyName: advisedProp,        operator: 'GTE', value: String(startMs) },
+        { propertyName: advisedProp,        operator: 'LTE', value: String(endMs) },
+      ]}],
+      properties: [advisedProp, 'hubspot_owner_id'],
+    }),
+    searchAll('meetings', {
+      filterGroups: [{ filters: [
+        { propertyName: 'hs_meeting_outcome',    operator: 'EQ',  value: 'COMPLETED' },
+        { propertyName: 'hubspot_owner_id',      operator: 'IN',  values: AE_IDS },
+        { propertyName: 'hs_meeting_start_time', operator: 'GTE', value: String(startMs) },
+        { propertyName: 'hs_meeting_start_time', operator: 'LTE', value: String(endMs) },
+      ]}],
+      properties: ['hs_meeting_start_time', 'hubspot_owner_id', 'hs_activity_type'],
+    }),
+  ]);
+
+  const closedWon  = bucket(cwDeals, r => r.properties.closedate, r => r.properties.hubspot_owner_id, r => parseFloat(r.properties.amount || 0));
+  const offersSent = bucket(offDeals, r => r.properties[advisedProp], r => r.properties.hubspot_owner_id);
+  const meetings   = bucket(allMtgs.filter(r => MEETING_TYPES.some(t => (r.properties.hs_activity_type || '').toLowerCase().includes(t))),
+    r => r.properties.hs_meeting_start_time, r => r.properties.hubspot_owner_id);
+
+  writeFileSync(Q1_FILE, JSON.stringify({
+    updated_at: new Date().toISOString(),
+    quarter: 'Q1-2026', quarter_start: Q1_START, quarter_end: Q1_END,
+    closed_won: closedWon, offers_sent: offersSent, meetings, pipeline_snapshot: [],
+  }, null, 2));
+  console.log(`✅  q1-data.json written (${closedWon.length} CW rows, ${offersSent.length} offer rows, ${meetings.length} meeting rows)\n`);
+}
+
 async function main() {
   console.log(`\n🔄  Syncing AE data — quarter start: ${manual.quarter_start}\n`);
 
@@ -206,6 +263,13 @@ async function main() {
   console.log(`    Offers Sent rows:   ${offersSent.length}`);
   console.log(`    Meeting rows:       ${meetings.length}`);
   console.log(`    Pipeline rows:      ${pipelineSnapshot.length}\n`);
+
+  // Fetch Q1 historical data only if not already present
+  if (!existsSync(Q1_FILE)) {
+    await fetchAndWriteQ1();
+  } else {
+    console.log(`ℹ️  q1-data.json already exists — skipping Q1 fetch (delete to re-fetch)\n`);
+  }
 }
 
 main().catch(err => { console.error('❌ ', err.message); process.exit(1); });
