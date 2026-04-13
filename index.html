@@ -178,7 +178,7 @@ function process(data, manual) {
     const out = { labels: weeks.map(fmtWeek), team: [] };
     for (const ae of AE_LIST) out[ae.id] = [];
     for (const w of weeks) {
-      if (w > todayW) {
+      if (w >= todayW) {
         for (const ae of AE_LIST) out[ae.id].push(null);
         out.team.push(null);
         continue;
@@ -203,7 +203,7 @@ function process(data, manual) {
   function weekly(map, weeks) {
     const out = { labels: weeks.map(fmtWeek) };
     for (const ae of AE_LIST)
-      out[ae.id] = weeks.map(w => (map[w] || {})[ae.id] || 0);
+      out[ae.id] = weeks.map(w => w >= todayW ? null : (map[w] || {})[ae.id] || 0);
     return out;
   }
   const ofWeekly = weekly(ofMap, qWeeks);
