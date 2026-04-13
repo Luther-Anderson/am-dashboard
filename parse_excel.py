@@ -24,8 +24,8 @@ SCRIPT_DIR = Path(__file__).parent
 AE_MAP = {
     'Alberto': ('76991650', 'Alberto Marchetti',  5, 15),
     'Jakob':   ('84528640', 'Jakob Hauser',        8, 28),
-    'Manuel':  ('87073113', 'Manuel Martinez',    11, 41),
-    'Omri':    ('89389021', 'Omri Daniel',        14, 54),
+    'Manuel':  ('87073113', 'Manuel Martinez',    11, 54),
+    'Omri':    ('89389021', 'Omri Daniel',        14, 41),
 }
 
 # Row offsets within each AE ops block (relative to block_start, 1-indexed)

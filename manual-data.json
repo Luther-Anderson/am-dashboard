@@ -15,10 +15,26 @@
     "89389021": { "name": "Omri Daniel",        "cash_in_quarterly": 60000, "weekly_meetings": 11, "weekly_offers": 5,   "notes": [] }
   },
   "qualitative": {
-    "team_highlights": [],
-    "focus_this_week": [],
-    "main_blockers": [],
-    "additional_notes": []
+    "team_highlights": [
+      "Alberto delivered 301% of his weekly financial target in Q2 Week 1, driven by remaining Q1 deals converting into Q2.",
+      "Manuel was the only AE to reach 100%+ of his operational target, hitting above goal on meetings, offers, and call volume.",
+      "Friday Sales War: Alberto and Manuel ran a 4-hour prospecting blitz, collectively booking 50+ meetings and generating exceptional call activity."
+    ],
+    "focus_this_week": [
+      "Stabilise operational KPIs at 100% attainment across all AEs.",
+      "Improve the Overloop inbound lead enrichment process to unblock Omri's pipeline.",
+      "Conduct Manuel's 3-month check-in.",
+      "Execute pipeline hygiene clean-up."
+    ],
+    "main_blockers": [
+      "Jakob was ill for 3 days in Week 1, significantly impacting his call and meeting output.",
+      "Omri's meeting volume was constrained by insufficient lead enrichment on Overloop sign-up flows.",
+      "Team-wide meeting count was lower than target due to time absorbed by Q1 deal closing and Jakob's absence."
+    ],
+    "additional_notes": [
+      "Célia has officially begun maternity leave; Manuel is taking over her ES (Spain) deal portfolio.",
+      "Luther is temporarily covering the FR (France) market in Célia's absence."
+    ]
   },
   "q1": {
     "quarter": "Q1-2026",
