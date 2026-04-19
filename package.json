@@ -1,10 +1,10 @@
 {
-  "name": "ae-dashboard",
+  "name": "am-dashboard",
   "version": "1.0.0",
-  "description": "Sortlist AE team KPI dashboard",
+  "description": "Sortlist AM team KPI dashboard",
   "type": "module",
   "scripts": {
-    "sync": "node sync.js"
+    "sync": "sh ~/sync-dashboards.sh"
   },
   "dependencies": {
     "node-fetch": "^3.3.2"

@@ -3,55 +3,20 @@
   "quarter_start": "2026-04-01",
   "quarter_end": "2026-06-30",
   "team": {
-    "cash_in_quarterly_target": 134400,
-    "weekly_meetings_target": 44,
-    "weekly_offers_target": 18
+    "cash_in_quarterly_target": 431773,
+    "weekly_meetings_target": 38,
+    "weekly_offers_target": 0
   },
   "per_ae": {
-    "76991650": { "name": "Alberto Marchetti", "cash_in_quarterly": 33600, "weekly_meetings": 11, "weekly_offers": 4.3, "notes": [] },
-    "40312105": { "name": "Célia Denouette",   "active": false, "cash_in_quarterly": 0, "weekly_meetings": 0, "weekly_offers": 0, "notes": [] },
-    "84528640": { "name": "Jakob Hauser",       "cash_in_quarterly": 33600, "weekly_meetings": 11, "weekly_offers": 4.3, "notes": [] },
-    "87073113": { "name": "Manuel Martinez",    "cash_in_quarterly": 33600, "weekly_meetings": 11, "weekly_offers": 4.3, "notes": [] },
-    "89389021": { "name": "Omri Daniel",        "cash_in_quarterly": 60000, "weekly_meetings": 11, "weekly_offers": 5,   "notes": [] }
+    "76991649":  { "name": "Patricia Chalmeta", "cash_in_quarterly": 109847, "weekly_meetings": 12, "weekly_offers": 0, "notes": [] },
+    "51221997":  { "name": "Antolin Lera Jeuk", "cash_in_quarterly": 154769, "weekly_meetings": 12, "weekly_offers": 0, "notes": [] },
+    "751897671": { "name": "Edouard Daenen",    "cash_in_quarterly": 146676, "weekly_meetings": 14, "weekly_offers": 0, "notes": [] },
+    "90532029":  { "name": "Viviana El Mouak",  "cash_in_quarterly": 20481,  "weekly_meetings": 0,  "weekly_offers": 0, "notes": [] }
   },
   "qualitative": {
-    "team_highlights": [
-      "Alberto delivered 301% of his weekly financial target in Q2 Week 1, driven by remaining Q1 deals converting into Q2.",
-      "Manuel was the only AE to reach 100%+ of his operational target, hitting above goal on meetings, offers, and call volume.",
-      "Friday Sales War: Alberto and Manuel ran a 4-hour prospecting blitz, collectively booking 50+ meetings and generating exceptional call activity."
-    ],
-    "focus_this_week": [
-      "Stabilise operational KPIs at 100% attainment across all AEs.",
-      "Improve the Overloop inbound lead enrichment process to unblock Omri's pipeline.",
-      "Conduct Manuel's 3-month check-in.",
-      "Execute pipeline hygiene clean-up."
-    ],
-    "main_blockers": [
-      "Jakob was ill for 3 days in Week 1, significantly impacting his call and meeting output.",
-      "Omri's meeting volume was constrained by insufficient lead enrichment on Overloop sign-up flows.",
-      "Team-wide meeting count was lower than target due to time absorbed by Q1 deal closing and Jakob's absence."
-    ],
-    "additional_notes": [
-      "Célia has officially begun maternity leave; Manuel is taking over her ES (Spain) deal portfolio.",
-      "Luther is temporarily covering the FR (France) market in Célia's absence."
-    ]
-  },
-  "q1": {
-    "quarter": "Q1-2026",
-    "quarter_start": "2026-01-01",
-    "quarter_end": "2026-03-31",
-    "team": {
-      "cash_in_quarterly_target": 159840,
-      "weekly_meetings_target": 48.31,
-      "weekly_offers_target": 13.69
-    },
-    "per_ae": {
-      "76991650": { "cash_in_quarterly": 36720, "weekly_meetings": 14,   "weekly_offers": 5    },
-      "40312105": { "cash_in_quarterly": 18900, "weekly_meetings": 6.8,  "weekly_offers": 1.9  },
-      "84528640": { "cash_in_quarterly": 22680, "weekly_meetings": 8.1,  "weekly_offers": 2.3  },
-      "87073113": { "cash_in_quarterly": 18900, "weekly_meetings": 6.8,  "weekly_offers": 1.9  },
-      "0":        { "cash_in_quarterly": 32400, "weekly_meetings": 11.56,"weekly_offers": 3.36 },
-      "89389021": { "cash_in_quarterly": 30240, "weekly_meetings": 7,    "weekly_offers": 2.16 }
-    }
+    "team_highlights": [],
+    "focus_this_week": [],
+    "main_blockers": [],
+    "additional_notes": []
   }
 }

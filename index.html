@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>AE Dashboard — Sortlist</title>
+  <title>AM Dashboard — Sortlist</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <script src="https://cdn.tailwindcss.com"></script>
@@ -43,7 +43,7 @@
   <!-- Header -->
   <div class="flex items-start justify-between mb-6">
     <div>
-      <h1 class="text-xl font-semibold text-slate-900">AE Dashboard</h1>
+      <h1 class="text-xl font-semibold text-slate-900">AM Dashboard</h1>
       <p class="text-sm text-slate-400 mt-0.5" id="header-subtitle">Loading…</p>
     </div>
   </div>
@@ -64,11 +64,10 @@
 <script>
 // ─── Config ────────────────────────────────────────────────────────────────
 const AE_LIST = [
-  { id: '76991650', name: 'Alberto Marchetti', short: 'Alberto', color: '#8b5cf6' },
-  // Célia Denouette (40312105) — on leave Q2-2026
-  { id: '84528640', name: 'Jakob Hauser',       short: 'Jakob',   color: '#0ea5e9' },
-  { id: '87073113', name: 'Manuel Martinez',    short: 'Manuel',  color: '#22c55e' },
-  { id: '89389021', name: 'Omri Daniel',        short: 'Omri',    color: '#f43f5e' },
+  { id: '76991649',  name: 'Patricia Chalmeta', short: 'Patricia', color: '#8b5cf6' },
+  { id: '51221997',  name: 'Antolin Lera Jeuk', short: 'Antolin',  color: '#f97316' },
+  { id: '751897671', name: 'Edouard Daenen',    short: 'Edouard',  color: '#0ea5e9' },
+  { id: '90532029',  name: 'Viviana El Mouak',  short: 'Viviana',  color: '#ec4899' },
 ];
 const PACE_COLOR = '#94a3b8';
 const TEAM_COLOR = '#1e293b';
@@ -525,13 +524,13 @@ function renderTeam(p, manual, q1p) {
 
     ${sectionHeader('Operational')}
     <div class="grid grid-cols-3 gap-3 mb-4">
-      ${card('Meetings Last Week', p.teamMtLW, attainEmoji(p.teamMtLW, manual.team.weekly_meetings_target))}
-      ${card('Offers Last Week',   p.teamOfLW, attainEmoji(p.teamOfLW, manual.team.weekly_offers_target))}
-      ${card('Conversion QTD',     (p.teamConv * 100).toFixed(1) + '%', 'offers → closed won')}
+      ${card('Meetings Last Week',   p.teamMtLW, attainEmoji(p.teamMtLW, manual.team.weekly_meetings_target))}
+      ${card('Renewals 30d Last Wk', p.teamOfLW, attainEmoji(p.teamOfLW, manual.team.weekly_offers_target))}
+      ${card('Renewal Rate QTD',   (p.teamConv * 100).toFixed(1) + '%', 'renewals 30d → closed won')}
     </div>
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
-      ${chartBox('Meetings vs Quarterly Pace',    'c-meet-team',   280)}
-      ${chartBox('Offers Sent vs Quarterly Pace', 'c-offers-team', 280)}
+      ${chartBox('Meetings vs Quarterly Pace',       'c-meet-team',   280)}
+      ${chartBox('Renewals 30d vs Quarterly Pace', 'c-offers-team', 280)}
     </div>
 
     ${sectionHeader('Qualitative')}
@@ -544,9 +543,8 @@ function renderTeam(p, manual, q1p) {
 
     <div>${chartBox('Pipeline Snapshot (€ by Stage)', 'c-pipe-team', 260)}</div>
     <div class="flex flex-wrap gap-x-6 gap-y-1 mt-2 text-[10px] text-slate-400">
-      <span><b class="text-slate-500">Explored</b> = First Exploration Meeting completed</span>
-      <span><b class="text-slate-500">Advised</b> = Demo done &amp; Offer Sent — Waiting for an answer</span>
-      <span><b class="text-slate-500">Offer Signed</b> = Quote signed but cash not in yet</span>
+      <span><b class="text-slate-500">Renewal &lt; 3 mo</b> = AM actively managing upcoming renewal</span>
+      <span><b class="text-slate-500">Renewal in 30d</b> = Renewal proposal sent — awaiting signature</span>
     </div>`;
 }
 
@@ -649,19 +647,18 @@ function renderAE(ae, p, manual) {
 
     ${sectionHeader('Operational')}
     <div class="grid grid-cols-3 gap-3 mb-4">
-      ${card('Meetings Last Week', mtLW,                                attainEmoji(mtLW, mwT))}
-      ${card('Offers Last Week',   ofLW,                                attainEmoji(ofLW, owT))}
-      ${card('Conversion QTD',     (conv * 100).toFixed(1) + '%',       'offers → closed won')}
+      ${card('Meetings Last Week',   mtLW,                                attainEmoji(mtLW, mwT))}
+      ${card('Renewals 30d Last Wk', ofLW,                              attainEmoji(ofLW, owT))}
+      ${card('Renewal Rate QTD',   (conv * 100).toFixed(1) + '%',       'renewals 30d → closed won')}
     </div>
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
       ${chartBox('Meetings vs Quarterly Pace', `c-meet-${ae.id}`,   260)}
-      ${chartBox('Offers Sent per Week',       `c-offers-${ae.id}`, 220)}
+      ${chartBox('Renewals 30d per Week',      `c-offers-${ae.id}`, 220)}
     </div>
     <div>${chartBox('Pipeline Snapshot', `c-pipe-${ae.id}`, 220)}</div>
     <div class="flex flex-wrap gap-x-6 gap-y-1 mt-2 text-[10px] text-slate-400">
-      <span><b class="text-slate-500">Explored</b> = First Exploration Meeting completed</span>
-      <span><b class="text-slate-500">Advised</b> = Demo done &amp; Offer Sent — Waiting for an answer</span>
-      <span><b class="text-slate-500">Offer Signed</b> = Quote signed but cash not in yet</span>
+      <span><b class="text-slate-500">Renewal &lt; 3 mo</b> = AM actively managing upcoming renewal</span>
+      <span><b class="text-slate-500">Renewal in 30d</b> = Renewal proposal sent — awaiting signature</span>
     </div>
     ${tgt.notes && tgt.notes.length ? `<div class="mt-4">${narrativeBox('Notes', '📝', Array.isArray(tgt.notes) ? tgt.notes : [tgt.notes])}</div>` : ''}`;
 
