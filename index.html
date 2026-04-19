@@ -137,9 +137,16 @@ function process(data, manual) {
     }
     return m;
   }
-  const cwMap = toMap(data.closed_won,  'amount');
-  const ofMap = toMap(data.offers_sent, 'count');
-  const mtMap = toMap(data.meetings,    'count');
+  const cwMap = toMap(data.closed_won,        'amount');
+  const mtMap = toMap(data.meetings,           'count');
+  const clMap = toMap(data.closed_lost || [],  'count');
+
+  // Avg meeting time: direct lookup (not summable) — week → owner_id → minutes
+  const amLookup = {};
+  for (const r of (data.avg_meeting_time || [])) {
+    if (!amLookup[r.week]) amLookup[r.week] = {};
+    amLookup[r.week][r.owner_id] = r.avg_minutes;
+  }
 
   function qtd(map) {
     const t = {};
@@ -149,27 +156,33 @@ function process(data, manual) {
     return t;
   }
   const cashInQtd   = qtd(cwMap);
-  const offersQtd   = qtd(ofMap);
   const meetingsQtd = qtd(mtMap);
+  const clQtd       = qtd(clMap);
 
   const cashInLW   = lastWeek ? (cwMap[lastWeek] || {}) : {};
-  const offersLW   = lastWeek ? (ofMap[lastWeek] || {}) : {};
   const meetingsLW = lastWeek ? (mtMap[lastWeek] || {}) : {};
+  const clLW       = lastWeek ? (clMap[lastWeek] || {}) : {};
 
   const sum = obj => Object.values(obj).reduce((a, b) => a + b, 0);
   const teamCashQtd = sum(cashInQtd);
-  const teamOfQtd   = sum(offersQtd);
   const teamMtQtd   = sum(meetingsQtd);
+  const teamClQtd   = sum(clQtd);
   const teamCashLW  = sum(cashInLW);
-  const teamOfLW    = sum(offersLW);
   const teamMtLW    = sum(meetingsLW);
+  const teamClLW    = sum(clLW);
 
+  // Renewal rate: closed won / (closed won + closed lost) for the quarter
   const cwCount = {};
-  for (const r of data.closed_won) cwCount[r.owner_id] = (cwCount[r.owner_id] || 0) + (r.count || 1);
+  for (const r of data.closed_won)        cwCount[r.owner_id] = (cwCount[r.owner_id] || 0) + (r.count || 1);
+  const clCount = {};
+  for (const r of (data.closed_lost||[])) clCount[r.owner_id] = (clCount[r.owner_id] || 0) + (r.count || 1);
   const convRate = {};
-  for (const ae of AE_LIST)
-    convRate[ae.id] = (offersQtd[ae.id] || 0) > 0 ? (cwCount[ae.id] || 0) / offersQtd[ae.id] : 0;
-  const teamConv = teamOfQtd > 0 ? sum(cwCount) / teamOfQtd : 0;
+  for (const ae of AE_LIST) {
+    const cw = cwCount[ae.id] || 0, cl = clCount[ae.id] || 0;
+    convRate[ae.id] = (cw + cl) > 0 ? cw / (cw + cl) : 0;
+  }
+  const teamConv = (sum(cwCount) + sum(clCount)) > 0
+    ? sum(cwCount) / (sum(cwCount) + sum(clCount)) : 0;
 
   function cumulative(map, weeks) {
     const running = {};
@@ -197,29 +210,27 @@ function process(data, manual) {
   }
   const cwCum = cumulative(cwMap, qWeeks);
   const mtCum = cumulative(mtMap, qWeeks);
-  const ofCum = cumulative(ofMap, qWeeks);
 
-  function weekly(map, weeks) {
+  // Weekly avg meeting time per AM (null for future/missing weeks)
+  function weeklyAmt(lookup, weeks) {
     const out = { labels: weeks.map(fmtWeek) };
     for (const ae of AE_LIST)
-      out[ae.id] = weeks.map(w => w >= todayW ? null : (map[w] || {})[ae.id] || 0);
+      out[ae.id] = weeks.map(w => w >= todayW ? null : ((lookup[w] || {})[ae.id] ?? null));
     return out;
   }
-  const ofWeekly = weekly(ofMap, qWeeks);
-  const mtWeekly = weekly(mtMap, qWeeks);
+  const amWeekly = weeklyAmt(amLookup, qWeeks);
 
   const teamCashPace = paceArr(manual.team.cash_in_quarterly_target, numWeeks);
   const teamMtPace   = paceArr(manual.team.weekly_meetings_target * numWeeks, numWeeks);
-  const teamOfPace   = paceArr(manual.team.weekly_offers_target   * numWeeks, numWeeks);
 
   return {
     qWeeks, numWeeks, lastWeek, currentWeekIdx,
-    cashInQtd, offersQtd, meetingsQtd, convRate,
-    teamCashQtd, teamOfQtd, teamMtQtd, teamConv,
-    cashInLW, offersLW, meetingsLW,
-    teamCashLW, teamOfLW, teamMtLW,
-    cwCum, mtCum, ofCum, ofWeekly, mtWeekly,
-    teamCashPace, teamMtPace, teamOfPace,
+    cashInQtd, meetingsQtd, clQtd, convRate,
+    teamCashQtd, teamMtQtd, teamClQtd, teamConv,
+    cashInLW, meetingsLW, clLW,
+    teamCashLW, teamMtLW, teamClLW,
+    cwCum, mtCum, amWeekly,
+    teamCashPace, teamMtPace,
     pipelineSnapshot: data.pipeline_snapshot,
   };
 }
@@ -438,6 +449,28 @@ function pipelineChart(id, snapshot, filterAeIds) {
   mkChart(id, { type: 'bar', data: { labels: stages, datasets: ds }, options: opts });
 }
 
+function avgMeetingChart(id, labels, datasets, targetMin) {
+  const ds = datasets.map(({ label, data, color }) => ({
+    label, data,
+    backgroundColor: data.map(v => v === null ? 'transparent' : color + 'c0'),
+    borderColor:     data.map(v => v === null ? 'transparent' : color),
+    borderWidth: 1, borderRadius: 3,
+  }));
+  ds.push({
+    label: `Target (${targetMin} min)`,
+    data: Array(labels.length).fill(targetMin),
+    type: 'line',
+    borderColor: PACE_COLOR, backgroundColor: 'transparent',
+    borderWidth: 1.5, borderDash: [6, 4],
+    pointRadius: 0, fill: false,
+  });
+  const opts = baseOpts();
+  opts.plugins.tooltip.callbacks = { label: c => c.raw !== null ? ` ${c.dataset.label}: ${c.raw} min` : null };
+  opts.scales.y.ticks.callback = v => v + ' min';
+  opts.scales.y.min = 0;
+  mkChart(id, { type: 'bar', data: { labels, datasets: ds }, options: opts });
+}
+
 // ─── DOM builders ──────────────────────────────────────────────────────────
 function attainEmoji(actual, target) {
   if (!target) return '';
@@ -524,13 +557,13 @@ function renderTeam(p, manual, q1p) {
 
     ${sectionHeader('Operational')}
     <div class="grid grid-cols-3 gap-3 mb-4">
-      ${card('Meetings Last Week',   p.teamMtLW, attainEmoji(p.teamMtLW, manual.team.weekly_meetings_target))}
-      ${card('Renewals 30d Last Wk', p.teamOfLW, attainEmoji(p.teamOfLW, manual.team.weekly_offers_target))}
-      ${card('Renewal Rate QTD',   (p.teamConv * 100).toFixed(1) + '%', 'renewals 30d → closed won')}
+      ${card('Meetings Last Week',        p.teamMtLW,  attainEmoji(p.teamMtLW, manual.team.weekly_meetings_target))}
+      ${card('Churned agencies last week', p.teamClLW, p.teamClLW === 0 ? '🟢 None this week' : `🔴 ${p.teamClLW} churned`)}
+      ${card('Renewal Rate QTD',          (p.teamConv * 100).toFixed(1) + '%', 'closed won / (won + lost)')}
     </div>
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
-      ${chartBox('Meetings vs Quarterly Pace',       'c-meet-team',   280)}
-      ${chartBox('Renewals 30d vs Quarterly Pace', 'c-offers-team', 280)}
+      ${chartBox('Meetings vs Quarterly Pace',    'c-meet-team', 280)}
+      ${chartBox('Avg Meeting Time (min)',         'c-amt-team',  280)}
     </div>
 
     ${sectionHeader('Qualitative')}
@@ -559,10 +592,9 @@ function initTeamCharts(p, manual, q1p) {
     p.teamMtPace, v => v,
     q1p ? q1p.mtCum.team : null);
 
-  paceChart('c-offers-team', p.ofCum.labels,
-    [{ label: 'Team Achieved', data: p.ofCum.team }],
-    p.teamOfPace, v => v,
-    q1p ? q1p.ofCum.team : null);
+  avgMeetingChart('c-amt-team', p.amWeekly.labels,
+    AE_LIST.map(ae => ({ label: ae.short, data: p.amWeekly[ae.id], color: ae.color })),
+    40);
 
   pipelineChart('c-pipe-team', p.pipelineSnapshot, null);
 }
@@ -623,7 +655,7 @@ function renderAE(ae, p, manual) {
   const conv   = p.convRate[ae.id]   || 0;
   const cashLW = p.cashInLW[ae.id]   || 0;
   const mtLW   = p.meetingsLW[ae.id] || 0;
-  const ofLW   = p.offersLW[ae.id]   || 0;
+  const clLW   = p.clLW[ae.id]       || 0;
 
   const div = document.createElement('div');
   div.id = `panel-${ae.id}`;
@@ -647,13 +679,13 @@ function renderAE(ae, p, manual) {
 
     ${sectionHeader('Operational')}
     <div class="grid grid-cols-3 gap-3 mb-4">
-      ${card('Meetings Last Week',   mtLW,                                attainEmoji(mtLW, mwT))}
-      ${card('Renewals 30d Last Wk', ofLW,                              attainEmoji(ofLW, owT))}
-      ${card('Renewal Rate QTD',   (conv * 100).toFixed(1) + '%',       'renewals 30d → closed won')}
+      ${card('Meetings Last Week',        mtLW,  attainEmoji(mtLW, mwT))}
+      ${card('Churned agencies last week', clLW,  clLW === 0 ? '🟢 None this week' : `🔴 ${clLW} churned`)}
+      ${card('Renewal Rate QTD',          (conv * 100).toFixed(1) + '%', 'closed won / (won + lost)')}
     </div>
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
-      ${chartBox('Meetings vs Quarterly Pace', `c-meet-${ae.id}`,   260)}
-      ${chartBox('Renewals 30d per Week',      `c-offers-${ae.id}`, 220)}
+      ${chartBox('Meetings vs Quarterly Pace', `c-meet-${ae.id}`, 260)}
+      ${chartBox('Avg Meeting Time (min)',      `c-amt-${ae.id}`,  220)}
     </div>
     <div>${chartBox('Pipeline Snapshot', `c-pipe-${ae.id}`, 220)}</div>
     <div class="flex flex-wrap gap-x-6 gap-y-1 mt-2 text-[10px] text-slate-400">
@@ -679,9 +711,9 @@ function initAECharts(ae, p, manual) {
     [{ label: ae.name, data: p.mtCum[ae.id] }],
     paceArr(mwT * n, n), v => v);
 
-  stackedBar(`c-offers-${ae.id}`, p.ofWeekly.labels,
-    [{ label: 'Offers', data: p.ofWeekly[ae.id], color: ae.color }],
-    v => v, p.currentWeekIdx);
+  avgMeetingChart(`c-amt-${ae.id}`, p.amWeekly.labels,
+    [{ label: ae.name, data: p.amWeekly[ae.id], color: ae.color }],
+    40);
 
   pipelineChart(`c-pipe-${ae.id}`, p.pipelineSnapshot, [ae.id]);
 }

@@ -4,7 +4,8 @@
   "description": "Sortlist AM team KPI dashboard",
   "type": "module",
   "scripts": {
-    "sync": "sh ~/sync-dashboards.sh"
+    "sync": "sh ~/sync-dashboards.sh",
+    "sync:hubspot": "node sync-hubspot.js"
   },
   "dependencies": {
     "node-fetch": "^3.3.2"

@@ -20,14 +20,15 @@ except ImportError:
 # ─── Config ────────────────────────────────────────────────────────────────
 SCRIPT_DIR = Path(__file__).parent
 
-# Excel name → (owner_id, full_name, fin_row, ops_meetings_row)
-# fin_row      : row in 'Sales Financial KPIs'  (total cash-in per AM)
-# ops_meetings_row : row in 'Sales Operational KPIs'  (# of meetings)
+# Excel name → (owner_id, full_name, fin_row, ops_meetings_row, ops_avg_time_row)
+# fin_row          : row in 'Sales Financial KPIs'   (total cash-in per AM)
+# ops_meetings_row : row in 'Sales Operational KPIs' (# of meetings)
+# ops_avg_time_row : row in 'Sales Operational KPIs' (avg meeting time in minutes)
 AM_MAP = {
-    'Edouard':  ('751897671', 'Edouard Daenen',    19, 75),
-    'Viviana':  ('90532029',  'Viviana El Mouak',  24, 82),
-    'Patricia': ('76991649',  'Patricia Chalmeta', 29, 89),
-    'Antolin':  ('51221997',  'Antolin Lera Jeuk', 34, 96),
+    'Edouard':  ('751897671', 'Edouard Daenen',    19, 75, 78),
+    'Viviana':  ('90532029',  'Viviana El Mouak',  24, 82, 85),
+    'Patricia': ('76991649',  'Patricia Chalmeta', 29, 89, 92),
+    'Antolin':  ('51221997',  'Antolin Lera Jeuk', 34, 96, 99),
 }
 
 COL_START = 2   # Column B (first week)
@@ -101,11 +102,12 @@ def parse(xlsx_path, manual):
     resolved = [w for w in sheet_weeks if w]
     print(f'  📅  Weeks resolved: {resolved[0]} → {resolved[-1]}  ({len(resolved)} weeks)')
 
-    closed_won, meetings_out = [], []
+    closed_won, meetings_out, avg_meeting_time_out = [], [], []
 
-    for am_key, (owner_id, owner_name, fin_row, ops_mtg_row) in AM_MAP.items():
+    for am_key, (owner_id, owner_name, fin_row, ops_mtg_row, ops_amt_row) in AM_MAP.items():
         cash_vals = read_row(fin_ws, fin_row)
         meet_vals = read_row(ops_ws, ops_mtg_row)
+        amt_vals  = read_row(ops_ws, ops_amt_row)
 
         for i, week in enumerate(sheet_weeks):
             if week is None or week not in valid_weeks:
@@ -113,6 +115,7 @@ def parse(xlsx_path, manual):
 
             cash  = cash_vals[i]
             meets = meet_vals[i]
+            amt   = amt_vals[i]
 
             if cash > 0:
                 closed_won.append({
@@ -124,8 +127,13 @@ def parse(xlsx_path, manual):
                     'week': week, 'owner_id': owner_id, 'owner_name': owner_name,
                     'count': int(meets),
                 })
+            if amt > 0:
+                avg_meeting_time_out.append({
+                    'week': week, 'owner_id': owner_id, 'owner_name': owner_name,
+                    'avg_minutes': round(amt, 1),
+                })
 
-    return closed_won, meetings_out
+    return closed_won, meetings_out, avg_meeting_time_out
 
 # ─── Main ──────────────────────────────────────────────────────────────────
 def main():
@@ -139,26 +147,31 @@ def main():
     print(f'\n📊  Parsing {xlsx_path.name} …')
 
     manual = json.loads((SCRIPT_DIR / 'manual-data.json').read_text())
-    closed_won, meetings = parse(xlsx_path, manual)
+    closed_won, meetings, avg_meeting_time = parse(xlsx_path, manual)
 
-    print(f'  ✅  Cash-In rows:   {len(closed_won)}')
-    print(f'  ✅  Meeting rows:   {len(meetings)}')
+    print(f'  ✅  Cash-In rows:        {len(closed_won)}')
+    print(f'  ✅  Meeting rows:        {len(meetings)}')
+    print(f'  ✅  Avg meeting time:    {len(avg_meeting_time)}')
 
-    # Preserve existing pipeline_snapshot
+    # Preserve pipeline_snapshot and closed_lost from HubSpot (updated separately)
     data_path = SCRIPT_DIR / 'data.json'
     pipeline_snapshot = []
+    closed_lost = []
     if data_path.exists():
         existing = json.loads(data_path.read_text())
         pipeline_snapshot = existing.get('pipeline_snapshot', [])
-        print(f'  ✅  Pipeline rows:  {len(pipeline_snapshot)} (kept from last HubSpot sync)')
+        closed_lost       = existing.get('closed_lost', [])
+        print(f'  ✅  Pipeline rows:      {len(pipeline_snapshot)} (kept from last HubSpot sync)')
+        print(f'  ✅  Closed Lost rows:   {len(closed_lost)} (kept from last HubSpot sync)')
 
     output = {
         'updated_at':        datetime.now(timezone.utc).isoformat(),
         'quarter':           manual['quarter'],
         'quarter_start':     manual['quarter_start'],
-        'closed_won':        sorted(closed_won,  key=lambda r: (r['week'], r['owner_id'])),
-        'offers_sent':       [],   # AMs: not tracked in spreadsheet
-        'meetings':          sorted(meetings,    key=lambda r: (r['week'], r['owner_id'])),
+        'closed_won':        sorted(closed_won,         key=lambda r: (r['week'], r['owner_id'])),
+        'closed_lost':       sorted(closed_lost,        key=lambda r: (r['week'], r['owner_id'])),
+        'meetings':          sorted(meetings,           key=lambda r: (r['week'], r['owner_id'])),
+        'avg_meeting_time':  sorted(avg_meeting_time,  key=lambda r: (r['week'], r['owner_id'])),
         'pipeline_snapshot': pipeline_snapshot,
     }
 

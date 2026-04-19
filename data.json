@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-04-19T16:27:07.540926+00:00",
+  "updated_at": "2026-04-19T17:04:22.843425+00:00",
   "quarter": "Q2-2026",
   "quarter_start": "2026-04-01",
   "closed_won": [
@@ -25,7 +25,20 @@
       "count": 1
     }
   ],
-  "offers_sent": [],
+  "closed_lost": [
+    {
+      "week": "2026-04-06",
+      "owner_id": "76991649",
+      "owner_name": "Patricia Chalmeta",
+      "count": 1
+    },
+    {
+      "week": "2026-04-13",
+      "owner_id": "751897671",
+      "owner_name": "Edouard Daenen",
+      "count": 1
+    }
+  ],
   "meetings": [
     {
       "week": "2026-04-06",
@@ -64,5 +77,180 @@
       "count": 16
     }
   ],
-  "pipeline_snapshot": []
+  "avg_meeting_time": [
+    {
+      "week": "2026-04-06",
+      "owner_id": "51221997",
+      "owner_name": "Antolin Lera Jeuk",
+      "avg_minutes": 36.0
+    },
+    {
+      "week": "2026-04-06",
+      "owner_id": "751897671",
+      "owner_name": "Edouard Daenen",
+      "avg_minutes": 43.3
+    },
+    {
+      "week": "2026-04-06",
+      "owner_id": "76991649",
+      "owner_name": "Patricia Chalmeta",
+      "avg_minutes": 34.0
+    },
+    {
+      "week": "2026-04-13",
+      "owner_id": "51221997",
+      "owner_name": "Antolin Lera Jeuk",
+      "avg_minutes": 40.0
+    },
+    {
+      "week": "2026-04-13",
+      "owner_id": "751897671",
+      "owner_name": "Edouard Daenen",
+      "avg_minutes": 45.4
+    },
+    {
+      "week": "2026-04-13",
+      "owner_id": "76991649",
+      "owner_name": "Patricia Chalmeta",
+      "avg_minutes": 32.0
+    }
+  ],
+  "pipeline_snapshot": [
+    {
+      "owner_id": "51221997",
+      "owner_name": "Antolin Lera Jeuk",
+      "stage": "Onboarding",
+      "stage_order": 1,
+      "count": 41,
+      "value": 66465.6
+    },
+    {
+      "owner_id": "751897671",
+      "owner_name": "Edouard Daenen",
+      "stage": "Onboarding",
+      "stage_order": 1,
+      "count": 34,
+      "value": 68573.77
+    },
+    {
+      "owner_id": "76991649",
+      "owner_name": "Patricia Chalmeta",
+      "stage": "Onboarding",
+      "stage_order": 1,
+      "count": 23,
+      "value": 45372.32
+    },
+    {
+      "owner_id": "90532029",
+      "owner_name": "Viviana El Mouak",
+      "stage": "Onboarding",
+      "stage_order": 1,
+      "count": 7,
+      "value": 14364.0
+    },
+    {
+      "owner_id": "51221997",
+      "owner_name": "Antolin Lera Jeuk",
+      "stage": "Renewal > 6 mo",
+      "stage_order": 2,
+      "count": 13,
+      "value": 18831.6
+    },
+    {
+      "owner_id": "751897671",
+      "owner_name": "Edouard Daenen",
+      "stage": "Renewal > 6 mo",
+      "stage_order": 2,
+      "count": 47,
+      "value": 69389.68
+    },
+    {
+      "owner_id": "76991649",
+      "owner_name": "Patricia Chalmeta",
+      "stage": "Renewal > 6 mo",
+      "stage_order": 2,
+      "count": 24,
+      "value": 38133.6
+    },
+    {
+      "owner_id": "51221997",
+      "owner_name": "Antolin Lera Jeuk",
+      "stage": "Renewal 3-6 mo",
+      "stage_order": 3,
+      "count": 23,
+      "value": 31286.78
+    },
+    {
+      "owner_id": "751897671",
+      "owner_name": "Edouard Daenen",
+      "stage": "Renewal 3-6 mo",
+      "stage_order": 3,
+      "count": 42,
+      "value": 67307.52
+    },
+    {
+      "owner_id": "76991649",
+      "owner_name": "Patricia Chalmeta",
+      "stage": "Renewal 3-6 mo",
+      "stage_order": 3,
+      "count": 16,
+      "value": 22516.29
+    },
+    {
+      "owner_id": "51221997",
+      "owner_name": "Antolin Lera Jeuk",
+      "stage": "Renewal < 3 mo",
+      "stage_order": 4,
+      "count": 29,
+      "value": 43142.4
+    },
+    {
+      "owner_id": "751897671",
+      "owner_name": "Edouard Daenen",
+      "stage": "Renewal < 3 mo",
+      "stage_order": 4,
+      "count": 30,
+      "value": 45770.4
+    },
+    {
+      "owner_id": "76991649",
+      "owner_name": "Patricia Chalmeta",
+      "stage": "Renewal < 3 mo",
+      "stage_order": 4,
+      "count": 21,
+      "value": 32970.89
+    },
+    {
+      "owner_id": "90532029",
+      "owner_name": "Viviana El Mouak",
+      "stage": "Renewal < 3 mo",
+      "stage_order": 4,
+      "count": 2,
+      "value": 3456.0
+    },
+    {
+      "owner_id": "51221997",
+      "owner_name": "Antolin Lera Jeuk",
+      "stage": "Renewal in 30d",
+      "stage_order": 5,
+      "count": 16,
+      "value": 25607.64
+    },
+    {
+      "owner_id": "751897671",
+      "owner_name": "Edouard Daenen",
+      "stage": "Renewal in 30d",
+      "stage_order": 5,
+      "count": 23,
+      "value": 40961.72
+    },
+    {
+      "owner_id": "76991649",
+      "owner_name": "Patricia Chalmeta",
+      "stage": "Renewal in 30d",
+      "stage_order": 5,
+      "count": 9,
+      "value": 12900.0
+    }
+  ]
 }
