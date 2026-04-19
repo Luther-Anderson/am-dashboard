@@ -431,7 +431,7 @@ function conversionChart(id, labels, values, colors) {
 }
 
 function pipelineChart(id, snapshot, filterAeIds) {
-  const stages = ['New lead', 'Qualified', 'Explored', 'Advised', 'Offer Signed'];
+  const stages = ['Onboarding', 'Renewal > 6 mo', 'Renewal 3-6 mo', 'Renewal < 3 mo', 'Renewal in 30d'];
   const aes = filterAeIds ? AE_LIST.filter(ae => filterAeIds.includes(ae.id)) : AE_LIST;
   const ds = aes.map(ae => ({
     label: ae.short,
