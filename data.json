@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-04-19T17:04:22.843425+00:00",
+  "updated_at": "2026-04-19T17:41:46.554037+00:00",
   "quarter": "Q2-2026",
   "quarter_start": "2026-04-01",
   "closed_won": [
@@ -115,6 +115,28 @@
       "avg_minutes": 32.0
     }
   ],
+  "meetings_attainment": {
+    "team": {
+      "week_pct": 1.230769231,
+      "qtd_pct": 1.076923077
+    },
+    "751897671": {
+      "week_pct": 1.142857143,
+      "qtd_pct": 0.8571428571
+    },
+    "90532029": {
+      "week_pct": null,
+      "qtd_pct": null
+    },
+    "76991649": {
+      "week_pct": 1.333333333,
+      "qtd_pct": 1.333333333
+    },
+    "51221997": {
+      "week_pct": 1.416666667,
+      "qtd_pct": 0.9583333333
+    }
+  },
   "pipeline_snapshot": [
     {
       "owner_id": "51221997",

@@ -232,6 +232,7 @@ function process(data, manual) {
     cwCum, mtCum, amWeekly,
     teamCashPace, teamMtPace,
     pipelineSnapshot: data.pipeline_snapshot,
+    meetingsAttainment: data.meetings_attainment || {},
   };
 }
 
@@ -478,6 +479,12 @@ function attainEmoji(actual, target) {
   const em = pct >= 100 ? '🟢' : pct >= 90 ? '🟠' : '🔴';
   return `${em} ${pct.toFixed(0)}% of target`;
 }
+function attainEmojiPct(decimal) {
+  if (decimal === null || decimal === undefined) return '— no target set';
+  const pct = decimal * 100;
+  const em  = pct >= 100 ? '🟢' : pct >= 90 ? '🟠' : '🔴';
+  return `${em} ${pct.toFixed(0)}% of target`;
+}
 
 function progressBar(current, target, color) {
   const pct = Math.min(100, (current / (target || 1)) * 100).toFixed(1);
@@ -557,9 +564,9 @@ function renderTeam(p, manual, q1p) {
 
     ${sectionHeader('Operational')}
     <div class="grid grid-cols-3 gap-3 mb-4">
-      ${card('Meetings Last Week',        p.teamMtLW,  attainEmoji(p.teamMtLW, manual.team.weekly_meetings_target))}
+      ${card('Meetings Last Week',        p.teamMtLW,  attainEmojiPct(p.meetingsAttainment?.team?.week_pct))}
       ${card('Churned agencies last week', p.teamClLW, p.teamClLW === 0 ? '🟢 None this week' : `🔴 ${p.teamClLW} churned`)}
-      ${card('Renewal Rate QTD',          (p.teamConv * 100).toFixed(1) + '%', 'closed won / (won + lost)')}
+      ${card('Renewal Rate QTD',          'TBC', 'reassessing data quality')}
     </div>
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
       ${chartBox('Meetings vs Quarterly Pace',    'c-meet-team', 280)}
@@ -684,9 +691,9 @@ function renderAE(ae, p, manual) {
 
     ${sectionHeader('Operational')}
     <div class="grid grid-cols-3 gap-3 mb-4">
-      ${card('Meetings Last Week',        mtLW,  attainEmoji(mtLW, mwT))}
+      ${card('Meetings Last Week',        mtLW,  attainEmojiPct(p.meetingsAttainment?.[ae.id]?.week_pct))}
       ${card('Churned agencies last week', clLW,  clLW === 0 ? '🟢 None this week' : `🔴 ${clLW} churned`)}
-      ${card('Renewal Rate QTD',          (conv * 100).toFixed(1) + '%', 'closed won / (won + lost)')}
+      ${card('Renewal Rate QTD',          'TBC', 'reassessing data quality')}
     </div>
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
       ${chartBox('Meetings vs Quarterly Pace', `c-meet-${ae.id}`, 260)}

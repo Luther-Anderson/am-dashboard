@@ -20,16 +20,22 @@ except ImportError:
 # ─── Config ────────────────────────────────────────────────────────────────
 SCRIPT_DIR = Path(__file__).parent
 
-# Excel name → (owner_id, full_name, fin_row, ops_meetings_row, ops_avg_time_row)
-# fin_row          : row in 'Sales Financial KPIs'   (total cash-in per AM)
-# ops_meetings_row : row in 'Sales Operational KPIs' (# of meetings)
-# ops_avg_time_row : row in 'Sales Operational KPIs' (avg meeting time in minutes)
+# Excel name → (owner_id, full_name, fin_row, ops_meetings_row, ops_avg_time_row, ops_week_pct_row, ops_qtd_row)
+# fin_row           : row in 'Sales Financial KPIs'   (total cash-in per AM)
+# ops_meetings_row  : row in 'Sales Operational KPIs' (# of meetings)
+# ops_avg_time_row  : row in 'Sales Operational KPIs' (avg meeting time in minutes)
+# ops_week_pct_row  : row in 'Sales Operational KPIs' (last-week attainment %)
+# ops_qtd_row       : row in 'Sales Operational KPIs' (QTD attainment %)
 AM_MAP = {
-    'Edouard':  ('751897671', 'Edouard Daenen',    19, 75, 78),
-    'Viviana':  ('90532029',  'Viviana El Mouak',  24, 82, 85),
-    'Patricia': ('76991649',  'Patricia Chalmeta', 29, 89, 92),
-    'Antolin':  ('51221997',  'Antolin Lera Jeuk', 34, 96, 99),
+    'Edouard':  ('751897671', 'Edouard Daenen',    19, 75, 78, 76, 77),
+    'Viviana':  ('90532029',  'Viviana El Mouak',  24, 82, 85, 83, 84),
+    'Patricia': ('76991649',  'Patricia Chalmeta', 29, 89, 92, 90, 91),
+    'Antolin':  ('51221997',  'Antolin Lera Jeuk', 34, 96, 99, 97, 98),
 }
+
+# Team-level attainment rows (Viviana excluded from target in sheet formula)
+TEAM_MTG_WEEK_PCT_ROW = 69
+TEAM_MTG_QTD_ROW      = 70
 
 COL_START = 2   # Column B (first week)
 COL_END   = 14  # Column N (last week — 13 weeks total)
@@ -63,6 +69,15 @@ def quarter_mondays(quarter_start, quarter_end):
         weeks.append(cur.strftime('%Y-%m-%d'))
         cur += timedelta(weeks=1)
     return weeks
+
+def last_value(ws, row_num):
+    """Return the last non-null numeric value in cols B–N (most recent completed week)."""
+    result = None
+    for col in range(COL_START, COL_END + 1):
+        v = ws.cell(row=row_num, column=col).value
+        if isinstance(v, (int, float)):
+            result = v
+    return result
 
 def read_row(ws, row_num):
     vals = []
@@ -102,12 +117,24 @@ def parse(xlsx_path, manual):
     resolved = [w for w in sheet_weeks if w]
     print(f'  📅  Weeks resolved: {resolved[0]} → {resolved[-1]}  ({len(resolved)} weeks)')
 
+    # Team-level meeting attainment (Viviana excluded from target by sheet formula)
+    meetings_attainment = {
+        'team': {
+            'week_pct': last_value(ops_ws, TEAM_MTG_WEEK_PCT_ROW),
+            'qtd_pct':  last_value(ops_ws, TEAM_MTG_QTD_ROW),
+        }
+    }
+
     closed_won, meetings_out, avg_meeting_time_out = [], [], []
 
-    for am_key, (owner_id, owner_name, fin_row, ops_mtg_row, ops_amt_row) in AM_MAP.items():
+    for am_key, (owner_id, owner_name, fin_row, ops_mtg_row, ops_amt_row, ops_week_pct_row, ops_qtd_row) in AM_MAP.items():
         cash_vals = read_row(fin_ws, fin_row)
         meet_vals = read_row(ops_ws, ops_mtg_row)
         amt_vals  = read_row(ops_ws, ops_amt_row)
+        meetings_attainment[owner_id] = {
+            'week_pct': last_value(ops_ws, ops_week_pct_row),
+            'qtd_pct':  last_value(ops_ws, ops_qtd_row),
+        }
 
         for i, week in enumerate(sheet_weeks):
             if week is None or week not in valid_weeks:
@@ -133,7 +160,7 @@ def parse(xlsx_path, manual):
                     'avg_minutes': round(amt, 1),
                 })
 
-    return closed_won, meetings_out, avg_meeting_time_out
+    return closed_won, meetings_out, avg_meeting_time_out, meetings_attainment
 
 # ─── Main ──────────────────────────────────────────────────────────────────
 def main():
@@ -147,7 +174,7 @@ def main():
     print(f'\n📊  Parsing {xlsx_path.name} …')
 
     manual = json.loads((SCRIPT_DIR / 'manual-data.json').read_text())
-    closed_won, meetings, avg_meeting_time = parse(xlsx_path, manual)
+    closed_won, meetings, avg_meeting_time, meetings_attainment = parse(xlsx_path, manual)
 
     print(f'  ✅  Cash-In rows:        {len(closed_won)}')
     print(f'  ✅  Meeting rows:        {len(meetings)}')
@@ -168,11 +195,12 @@ def main():
         'updated_at':        datetime.now(timezone.utc).isoformat(),
         'quarter':           manual['quarter'],
         'quarter_start':     manual['quarter_start'],
-        'closed_won':        sorted(closed_won,         key=lambda r: (r['week'], r['owner_id'])),
-        'closed_lost':       sorted(closed_lost,        key=lambda r: (r['week'], r['owner_id'])),
-        'meetings':          sorted(meetings,           key=lambda r: (r['week'], r['owner_id'])),
-        'avg_meeting_time':  sorted(avg_meeting_time,  key=lambda r: (r['week'], r['owner_id'])),
-        'pipeline_snapshot': pipeline_snapshot,
+        'closed_won':           sorted(closed_won,        key=lambda r: (r['week'], r['owner_id'])),
+        'closed_lost':          sorted(closed_lost,       key=lambda r: (r['week'], r['owner_id'])),
+        'meetings':             sorted(meetings,          key=lambda r: (r['week'], r['owner_id'])),
+        'avg_meeting_time':     sorted(avg_meeting_time, key=lambda r: (r['week'], r['owner_id'])),
+        'meetings_attainment':  meetings_attainment,
+        'pipeline_snapshot':    pipeline_snapshot,
     }
 
     data_path.write_text(json.dumps(output, indent=2))
