@@ -576,8 +576,8 @@ function renderTeam(p, manual, q1p) {
 
     <div>${chartBox('Pipeline Snapshot (€ by Stage)', 'c-pipe-team', 260)}</div>
     <div class="flex flex-wrap gap-x-6 gap-y-1 mt-2 text-[10px] text-slate-400">
-      <span><b class="text-slate-500">Renewal &lt; 3 mo</b> = AM actively managing upcoming renewal</span>
-      <span><b class="text-slate-500">Renewal in 30d</b> = Renewal proposal sent — awaiting signature</span>
+      <span><b class="text-slate-500">Renewal &gt; 6 mo / 3–6 mo</b> = AM preparing Annual Review meeting</span>
+      <span><b class="text-slate-500">Renewal in 30d</b> = AM actively negotiating upcoming renewal</span>
     </div>`;
 }
 
@@ -592,8 +592,13 @@ function initTeamCharts(p, manual, q1p) {
     p.teamMtPace, v => v,
     q1p ? q1p.mtCum.team : null);
 
+  // Team avg: mean of AMs with data each week
+  const teamAmtData = p.amWeekly.labels.map((_, wi) => {
+    const vals = AE_LIST.map(ae => p.amWeekly[ae.id][wi]).filter(v => v !== null);
+    return vals.length ? Math.round(vals.reduce((a, b) => a + b, 0) / vals.length * 10) / 10 : null;
+  });
   avgMeetingChart('c-amt-team', p.amWeekly.labels,
-    AE_LIST.map(ae => ({ label: ae.short, data: p.amWeekly[ae.id], color: ae.color })),
+    [{ label: 'Team Avg', data: teamAmtData, color: TEAM_COLOR }],
     40);
 
   pipelineChart('c-pipe-team', p.pipelineSnapshot, null);
@@ -689,8 +694,8 @@ function renderAE(ae, p, manual) {
     </div>
     <div>${chartBox('Pipeline Snapshot', `c-pipe-${ae.id}`, 220)}</div>
     <div class="flex flex-wrap gap-x-6 gap-y-1 mt-2 text-[10px] text-slate-400">
-      <span><b class="text-slate-500">Renewal &lt; 3 mo</b> = AM actively managing upcoming renewal</span>
-      <span><b class="text-slate-500">Renewal in 30d</b> = Renewal proposal sent — awaiting signature</span>
+      <span><b class="text-slate-500">Renewal &gt; 6 mo / 3–6 mo</b> = AM preparing Annual Review meeting</span>
+      <span><b class="text-slate-500">Renewal in 30d</b> = AM actively negotiating upcoming renewal</span>
     </div>
     ${tgt.notes && tgt.notes.length ? `<div class="mt-4">${narrativeBox('Notes', '📝', Array.isArray(tgt.notes) ? tgt.notes : [tgt.notes])}</div>` : ''}`;
 
