@@ -14,9 +14,27 @@
     "90532029":  { "name": "Viviana El Mouak",  "cash_in_quarterly": 20481,  "weekly_meetings": 0,  "weekly_offers": 0, "notes": [] }
   },
   "qualitative": {
-    "team_highlights": [],
-    "focus_this_week": [],
-    "main_blockers": [],
-    "additional_notes": []
+    "team_highlights": [
+      "High activity week for all AMs, especially Patricia and Antolin",
+      "Viviana advancing very fast in the onboarding"
+    ],
+    "focus_this_week": [
+      "Focus on low hanging fruit for cash generation and credit packs",
+      "Start 1-1s with members of the team",
+      "Introduce Viviana to Italian agencies",
+      "Review Operational KPIs for the team (possibly adapt)",
+      "Start tackling team's main difficulties",
+      "Launch Revival campaigns"
+    ],
+    "main_blockers": [
+      "Lack of technical knowledge on Overloop, slowing them down",
+      "Lack of proper Handover process for Overloop as well",
+      "Overloop sales curbed in Germany due to local regulations",
+      "Lack of AM on the NL market (Luther taking over as POC for now)"
+    ],
+    "additional_notes": [
+      "Clean handover from Alex and Niek",
+      "Gradually getting up to date with team dynamics"
+    ]
   }
 }
